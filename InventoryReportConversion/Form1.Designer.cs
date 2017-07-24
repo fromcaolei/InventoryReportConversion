@@ -30,7 +30,9 @@
         {
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.deleteUnusedColumns = new System.Windows.Forms.Button();
+            this.partNumberMid_1 = new System.Windows.Forms.Button();
+            this.renameSort_1 = new System.Windows.Forms.Button();
+            this.deleteUnusedColumns_1 = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
@@ -43,6 +45,7 @@
             this.button1 = new System.Windows.Forms.Button();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.test = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -69,7 +72,10 @@
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.deleteUnusedColumns);
+            this.panel1.Controls.Add(this.test);
+            this.panel1.Controls.Add(this.partNumberMid_1);
+            this.panel1.Controls.Add(this.renameSort_1);
+            this.panel1.Controls.Add(this.deleteUnusedColumns_1);
             this.panel1.Controls.Add(this.label3);
             this.panel1.Controls.Add(this.label2);
             this.panel1.Controls.Add(this.label1);
@@ -81,15 +87,35 @@
             this.panel1.Size = new System.Drawing.Size(1050, 134);
             this.panel1.TabIndex = 0;
             // 
-            // deleteUnusedColumns
+            // partNumberMid_1
             // 
-            this.deleteUnusedColumns.Location = new System.Drawing.Point(116, 35);
-            this.deleteUnusedColumns.Name = "deleteUnusedColumns";
-            this.deleteUnusedColumns.Size = new System.Drawing.Size(100, 23);
-            this.deleteUnusedColumns.TabIndex = 5;
-            this.deleteUnusedColumns.Text = "删除无用列";
-            this.deleteUnusedColumns.UseVisualStyleBackColor = true;
-            this.deleteUnusedColumns.Click += new System.EventHandler(this.deleteUnusedColumns_Click);
+            this.partNumberMid_1.Location = new System.Drawing.Point(328, 35);
+            this.partNumberMid_1.Name = "partNumberMid_1";
+            this.partNumberMid_1.Size = new System.Drawing.Size(100, 23);
+            this.partNumberMid_1.TabIndex = 7;
+            this.partNumberMid_1.Text = "零件图号(mid)";
+            this.partNumberMid_1.UseVisualStyleBackColor = true;
+            this.partNumberMid_1.Click += new System.EventHandler(this.partNumberMid_1_Click);
+            // 
+            // renameSort_1
+            // 
+            this.renameSort_1.Location = new System.Drawing.Point(222, 35);
+            this.renameSort_1.Name = "renameSort_1";
+            this.renameSort_1.Size = new System.Drawing.Size(100, 23);
+            this.renameSort_1.TabIndex = 6;
+            this.renameSort_1.Text = "更名与排序";
+            this.renameSort_1.UseVisualStyleBackColor = true;
+            this.renameSort_1.Click += new System.EventHandler(this.renameSort_1_Click);
+            // 
+            // deleteUnusedColumns_1
+            // 
+            this.deleteUnusedColumns_1.Location = new System.Drawing.Point(116, 35);
+            this.deleteUnusedColumns_1.Name = "deleteUnusedColumns_1";
+            this.deleteUnusedColumns_1.Size = new System.Drawing.Size(100, 23);
+            this.deleteUnusedColumns_1.TabIndex = 5;
+            this.deleteUnusedColumns_1.Text = "删除无用列";
+            this.deleteUnusedColumns_1.UseVisualStyleBackColor = true;
+            this.deleteUnusedColumns_1.Click += new System.EventHandler(this.deleteUnusedColumns_1_Click);
             // 
             // label3
             // 
@@ -189,6 +215,16 @@
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
+            // test
+            // 
+            this.test.Location = new System.Drawing.Point(745, 7);
+            this.test.Name = "test";
+            this.test.Size = new System.Drawing.Size(75, 23);
+            this.test.TabIndex = 8;
+            this.test.Text = "测试功能";
+            this.test.UseVisualStyleBackColor = true;
+            this.test.Click += new System.EventHandler(this.test_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -222,10 +258,13 @@
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button deleteUnusedColumns;
+        private System.Windows.Forms.Button deleteUnusedColumns_1;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
         private System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.Button renameSort_1;
+        private System.Windows.Forms.Button partNumberMid_1;
+        private System.Windows.Forms.Button test;
     }
 }
 
