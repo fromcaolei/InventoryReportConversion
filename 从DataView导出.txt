@@ -1,0 +1,192 @@
+ //从DataView导出
+        public void Export(ref DataGridView datagrid)
+        {
+            SaveFileDialog dlg = new SaveFileDialog();
+            dlg.Filter = "CSV文件(*.csv)|*.csv|文本文件(*.txt)|*.txt";
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    if (dlg.FilterIndex == 1)
+                    {
+                        try
+                        {
+                            #region 导出CSV文件
+
+                            StreamWriter write = new StreamWriter(dlg.FileName, false, Encoding.Default);
+
+                            //标题
+                            for (int t = 0; t < datagrid.ColumnCount; t++)
+                            {
+                                if (datagrid.Columns[t].Visible == true)
+                                {
+                                    write.Write(datagrid.Columns[t].HeaderText + ",");
+                                }
+                            }
+
+                            write.WriteLine();
+
+                            //明细
+                            for (int Lin = 2; Lin <= datagrid.RowCount + 1; Lin++)
+                            {
+                                if (datagrid.Rows[Lin - 2].Visible == true)
+                                {
+                                    string Tem = "";
+
+                                    for (int k = 0; k < datagrid.ColumnCount; k++)
+                                    {
+                                        if (datagrid.Columns[k].Visible == true)
+                                        {
+                                            if (datagrid.Rows[Lin - 2].Cells[k].Value != null)
+                                            {
+                                                string TemString = datagrid.Rows[Lin - 2].Cells[k].Value.ToString().Trim().Replace(',', '.');
+
+                                                Tem += TemString;
+                                                Tem += ",";
+                                            }
+                                            else
+                                            {
+                                                string TemString = " ";
+
+                                                Tem += TemString;
+                                                Tem += ",";
+                                            }
+                                        }
+                                    }
+
+                                    write.WriteLine(Tem);
+                                }
+                            }
+
+                            write.Flush();
+                            write.Close();
+
+                            #endregion
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message);
+                        }
+                    }
+                    else if (dlg.FilterIndex == 2)
+                    {
+                        #region 导出文本文件
+                        StreamWriter write = new StreamWriter(dlg.FileName, false, Encoding.Default);
+                        //标题行
+                        for (int t = 0; t < datagrid.ColumnCount; t++)
+                        {
+                            if (datagrid.Columns[t].Visible == true)
+                            {
+                                write.Write(datagrid.Columns[t].HeaderText + "\t");
+                            }
+                        }
+                        write.WriteLine();
+                        //明细行
+                        for (int Lin = 2; Lin <= datagrid.RowCount + 1; Lin++)
+                        {
+
+                            if (datagrid.Rows[Lin - 2].Visible == true)
+                            {
+                                string Tem = "";
+                                for (int k = 0; k < datagrid.ColumnCount; k++)
+                                {
+                                    if (datagrid.Columns[k].Visible)
+                                    {
+                                        if (datagrid.Rows[Lin - 2].Cells[k].Value != null)
+                                        {
+                                            //if (Tem != "")
+                                            //{
+                                            //    Tem += "\t";
+                                            //}
+                                            Tem += datagrid.Rows[Lin - 2].Cells[k].Value.ToString();
+                                            Tem += "\t";
+                                        }
+                                        else
+                                        {
+                                            string TemString = "";
+                                            //if (Tem != "")
+                                            //{
+                                            //    Tem += "\t";
+                                            //}
+
+                                            Tem += TemString;
+                                            Tem += "\t";
+                                        }
+                                    }
+
+                                }
+                                write.WriteLine(Tem);
+                            }
+                        }
+                        write.Flush();
+                        write.Close();
+                        #endregion
+                    }
+                    else if (dlg.FilterIndex == 3)
+                    {
+                        try
+                        {
+                            #region 导出EXCEL文件
+                            //Microsoft.Office.Interop.Excel.ApplicationClass app = new ApplicationClass();
+                            //app.Sheets.Add();
+
+                            //StreamWriter write = new StreamWriter(dlg.FileName, false, Encoding.Default, size * sizeCnt);
+
+                            ////标题
+                            //for (int t = 0; t < datagrid.ColumnCount; t++)
+                            //{
+                            //    if (datagrid.Columns[t].Visible == true)
+                            //    {
+                            //        write.Write(datagrid.Columns[t].HeaderText + ",");
+                            //    }
+                            //}
+                            //write.WriteLine();
+
+                            ////明细
+                            //for (int Lin = 2; Lin <= datagrid.RowCount + 1; Lin++)
+                            //{
+                            //    if (datagrid.Rows[Lin - 2].Visible == true)
+                            //    {
+                            //        string Tem = "";
+                            //        for (int k = 0; k < datagrid.ColumnCount; k++)
+                            //        {
+                            //            if (datagrid.Columns[k].Visible == true)
+                            //            {
+                            //                if (datagrid.Rows[Lin - 2].Cells[k].Value != null)
+                            //                {
+                            //                    string TemString = datagrid.Rows[Lin - 2].Cells[k].Value.ToString().Trim().Replace(',', '.');
+
+                            //                    Tem += TemString;
+                            //                    Tem += ",";
+                            //                }
+                            //                else
+                            //                {
+                            //                    string TemString = " ";
+                            //                    Tem += TemString;
+                            //                    Tem += ",";
+                            //                }
+                            //            }
+                            //        }
+                            //        write.WriteLine(Tem);
+                            //    }
+                            //}
+
+                            //write.Flush();
+                            //write.Close();
+
+                            #endregion
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+
+                MessageBox.Show("导出完毕！");
+            }
+        }

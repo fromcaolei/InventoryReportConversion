@@ -30,22 +30,36 @@
         {
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.manufacturerCodeMid_1 = new System.Windows.Forms.Button();
+            this.test = new System.Windows.Forms.Button();
             this.partNumberMid_1 = new System.Windows.Forms.Button();
             this.renameSort_1 = new System.Windows.Forms.Button();
             this.deleteUnusedColumns_1 = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.buttonDaoru = new System.Windows.Forms.Button();
+            this.importFile = new System.Windows.Forms.Button();
             this.txtDaoru = new System.Windows.Forms.TextBox();
             this.panel2 = new System.Windows.Forms.Panel();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.panel3 = new System.Windows.Forms.Panel();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
-            this.button1 = new System.Windows.Forms.Button();
+            this.exportFile = new System.Windows.Forms.Button();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.test = new System.Windows.Forms.Button();
+            this.deleteUnusedColumns_2 = new System.Windows.Forms.Button();
+            this.renameSort_2 = new System.Windows.Forms.Button();
+            this.partNumberMid_2 = new System.Windows.Forms.Button();
+            this.manufacturerCodeMid_2 = new System.Windows.Forms.Button();
+            this.orderNumber_2 = new System.Windows.Forms.Button();
+            this.time_2 = new System.Windows.Forms.Button();
+            this.deleteUnusedColumns_3 = new System.Windows.Forms.Button();
+            this.renameSort_3 = new System.Windows.Forms.Button();
+            this.partNumberMid_3 = new System.Windows.Forms.Button();
+            this.manufacturerCodeMid_3 = new System.Windows.Forms.Button();
+            this.receiveCustomerNumber_3 = new System.Windows.Forms.Button();
+            this.CustomerNumber_3 = new System.Windows.Forms.Button();
+            this.time_3 = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -72,6 +86,20 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.time_3);
+            this.panel1.Controls.Add(this.CustomerNumber_3);
+            this.panel1.Controls.Add(this.receiveCustomerNumber_3);
+            this.panel1.Controls.Add(this.manufacturerCodeMid_3);
+            this.panel1.Controls.Add(this.partNumberMid_3);
+            this.panel1.Controls.Add(this.renameSort_3);
+            this.panel1.Controls.Add(this.deleteUnusedColumns_3);
+            this.panel1.Controls.Add(this.time_2);
+            this.panel1.Controls.Add(this.orderNumber_2);
+            this.panel1.Controls.Add(this.manufacturerCodeMid_2);
+            this.panel1.Controls.Add(this.partNumberMid_2);
+            this.panel1.Controls.Add(this.renameSort_2);
+            this.panel1.Controls.Add(this.deleteUnusedColumns_2);
+            this.panel1.Controls.Add(this.manufacturerCodeMid_1);
             this.panel1.Controls.Add(this.test);
             this.panel1.Controls.Add(this.partNumberMid_1);
             this.panel1.Controls.Add(this.renameSort_1);
@@ -79,13 +107,34 @@
             this.panel1.Controls.Add(this.label3);
             this.panel1.Controls.Add(this.label2);
             this.panel1.Controls.Add(this.label1);
-            this.panel1.Controls.Add(this.buttonDaoru);
+            this.panel1.Controls.Add(this.importFile);
             this.panel1.Controls.Add(this.txtDaoru);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(3, 3);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1050, 134);
             this.panel1.TabIndex = 0;
+            // 
+            // manufacturerCodeMid_1
+            // 
+            this.manufacturerCodeMid_1.Location = new System.Drawing.Point(434, 35);
+            this.manufacturerCodeMid_1.Name = "manufacturerCodeMid_1";
+            this.manufacturerCodeMid_1.Size = new System.Drawing.Size(100, 23);
+            this.manufacturerCodeMid_1.TabIndex = 9;
+            this.manufacturerCodeMid_1.Text = "厂家代码(mid)";
+            this.manufacturerCodeMid_1.UseVisualStyleBackColor = true;
+            this.manufacturerCodeMid_1.Click += new System.EventHandler(this.manufacturerCodeMid_1_Click);
+            // 
+            // test
+            // 
+            this.test.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.test.Location = new System.Drawing.Point(745, 7);
+            this.test.Name = "test";
+            this.test.Size = new System.Drawing.Size(75, 23);
+            this.test.TabIndex = 8;
+            this.test.Text = "测试功能";
+            this.test.UseVisualStyleBackColor = true;
+            this.test.Click += new System.EventHandler(this.test_Click);
             // 
             // partNumberMid_1
             // 
@@ -144,16 +193,16 @@
             this.label1.TabIndex = 2;
             this.label1.Text = "库存日报表处理：";
             // 
-            // buttonDaoru
+            // importFile
             // 
-            this.buttonDaoru.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.buttonDaoru.Location = new System.Drawing.Point(626, 7);
-            this.buttonDaoru.Name = "buttonDaoru";
-            this.buttonDaoru.Size = new System.Drawing.Size(75, 23);
-            this.buttonDaoru.TabIndex = 1;
-            this.buttonDaoru.Text = "导入文件";
-            this.buttonDaoru.UseVisualStyleBackColor = true;
-            this.buttonDaoru.Click += new System.EventHandler(this.buttonDaoru_Click);
+            this.importFile.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.importFile.Location = new System.Drawing.Point(626, 7);
+            this.importFile.Name = "importFile";
+            this.importFile.Size = new System.Drawing.Size(75, 23);
+            this.importFile.TabIndex = 1;
+            this.importFile.Text = "导入文件";
+            this.importFile.UseVisualStyleBackColor = true;
+            this.importFile.Click += new System.EventHandler(this.importFile_Click);
             // 
             // txtDaoru
             // 
@@ -186,7 +235,7 @@
             // panel3
             // 
             this.panel3.Controls.Add(this.progressBar1);
-            this.panel3.Controls.Add(this.button1);
+            this.panel3.Controls.Add(this.exportFile);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel3.Location = new System.Drawing.Point(3, 569);
             this.panel3.Name = "panel3";
@@ -201,29 +250,143 @@
             this.progressBar1.TabIndex = 1;
             this.progressBar1.Visible = false;
             // 
-            // button1
+            // exportFile
             // 
-            this.button1.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.button1.Location = new System.Drawing.Point(488, 3);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "导出文件";
-            this.button1.UseVisualStyleBackColor = true;
+            this.exportFile.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.exportFile.Location = new System.Drawing.Point(488, 3);
+            this.exportFile.Name = "exportFile";
+            this.exportFile.Size = new System.Drawing.Size(75, 23);
+            this.exportFile.TabIndex = 0;
+            this.exportFile.Text = "导出文件";
+            this.exportFile.UseVisualStyleBackColor = true;
+            this.exportFile.Click += new System.EventHandler(this.exportFile_Click);
             // 
             // openFileDialog1
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
-            // test
+            // deleteUnusedColumns_2
             // 
-            this.test.Location = new System.Drawing.Point(745, 7);
-            this.test.Name = "test";
-            this.test.Size = new System.Drawing.Size(75, 23);
-            this.test.TabIndex = 8;
-            this.test.Text = "测试功能";
-            this.test.UseVisualStyleBackColor = true;
-            this.test.Click += new System.EventHandler(this.test_Click);
+            this.deleteUnusedColumns_2.Location = new System.Drawing.Point(116, 67);
+            this.deleteUnusedColumns_2.Name = "deleteUnusedColumns_2";
+            this.deleteUnusedColumns_2.Size = new System.Drawing.Size(100, 23);
+            this.deleteUnusedColumns_2.TabIndex = 10;
+            this.deleteUnusedColumns_2.Text = "删除无用列";
+            this.deleteUnusedColumns_2.UseVisualStyleBackColor = true;
+            this.deleteUnusedColumns_2.Click += new System.EventHandler(this.deleteUnusedColumns_2_Click);
+            // 
+            // renameSort_2
+            // 
+            this.renameSort_2.Location = new System.Drawing.Point(222, 67);
+            this.renameSort_2.Name = "renameSort_2";
+            this.renameSort_2.Size = new System.Drawing.Size(100, 23);
+            this.renameSort_2.TabIndex = 11;
+            this.renameSort_2.Text = "更名与排序";
+            this.renameSort_2.UseVisualStyleBackColor = true;
+            this.renameSort_2.Click += new System.EventHandler(this.renameSort_2_Click);
+            // 
+            // partNumberMid_2
+            // 
+            this.partNumberMid_2.Location = new System.Drawing.Point(328, 67);
+            this.partNumberMid_2.Name = "partNumberMid_2";
+            this.partNumberMid_2.Size = new System.Drawing.Size(100, 23);
+            this.partNumberMid_2.TabIndex = 12;
+            this.partNumberMid_2.Text = "零件图号(mid)";
+            this.partNumberMid_2.UseVisualStyleBackColor = true;
+            this.partNumberMid_2.Click += new System.EventHandler(this.partNumberMid_2_Click);
+            // 
+            // manufacturerCodeMid_2
+            // 
+            this.manufacturerCodeMid_2.Location = new System.Drawing.Point(434, 67);
+            this.manufacturerCodeMid_2.Name = "manufacturerCodeMid_2";
+            this.manufacturerCodeMid_2.Size = new System.Drawing.Size(100, 23);
+            this.manufacturerCodeMid_2.TabIndex = 13;
+            this.manufacturerCodeMid_2.Text = "厂家代码(mid)";
+            this.manufacturerCodeMid_2.UseVisualStyleBackColor = true;
+            this.manufacturerCodeMid_2.Click += new System.EventHandler(this.manufacturerCodeMid_2_Click);
+            // 
+            // orderNumber_2
+            // 
+            this.orderNumber_2.Location = new System.Drawing.Point(540, 67);
+            this.orderNumber_2.Name = "orderNumber_2";
+            this.orderNumber_2.Size = new System.Drawing.Size(100, 23);
+            this.orderNumber_2.TabIndex = 14;
+            this.orderNumber_2.Text = "订单号(mid)";
+            this.orderNumber_2.UseVisualStyleBackColor = true;
+            this.orderNumber_2.Click += new System.EventHandler(this.orderNumber_2_Click);
+            // 
+            // time_2
+            // 
+            this.time_2.Location = new System.Drawing.Point(646, 67);
+            this.time_2.Name = "time_2";
+            this.time_2.Size = new System.Drawing.Size(100, 23);
+            this.time_2.TabIndex = 15;
+            this.time_2.Text = "时间(DATE)";
+            this.time_2.UseVisualStyleBackColor = true;
+            this.time_2.Click += new System.EventHandler(this.time_2_Click);
+            // 
+            // deleteUnusedColumns_3
+            // 
+            this.deleteUnusedColumns_3.Location = new System.Drawing.Point(116, 99);
+            this.deleteUnusedColumns_3.Name = "deleteUnusedColumns_3";
+            this.deleteUnusedColumns_3.Size = new System.Drawing.Size(100, 23);
+            this.deleteUnusedColumns_3.TabIndex = 16;
+            this.deleteUnusedColumns_3.Text = "删除无用列";
+            this.deleteUnusedColumns_3.UseVisualStyleBackColor = true;
+            // 
+            // renameSort_3
+            // 
+            this.renameSort_3.Location = new System.Drawing.Point(222, 99);
+            this.renameSort_3.Name = "renameSort_3";
+            this.renameSort_3.Size = new System.Drawing.Size(100, 23);
+            this.renameSort_3.TabIndex = 17;
+            this.renameSort_3.Text = "更名与排序";
+            this.renameSort_3.UseVisualStyleBackColor = true;
+            // 
+            // partNumberMid_3
+            // 
+            this.partNumberMid_3.Location = new System.Drawing.Point(328, 99);
+            this.partNumberMid_3.Name = "partNumberMid_3";
+            this.partNumberMid_3.Size = new System.Drawing.Size(100, 23);
+            this.partNumberMid_3.TabIndex = 18;
+            this.partNumberMid_3.Text = "零件图号(mid)";
+            this.partNumberMid_3.UseVisualStyleBackColor = true;
+            // 
+            // manufacturerCodeMid_3
+            // 
+            this.manufacturerCodeMid_3.Location = new System.Drawing.Point(434, 99);
+            this.manufacturerCodeMid_3.Name = "manufacturerCodeMid_3";
+            this.manufacturerCodeMid_3.Size = new System.Drawing.Size(100, 23);
+            this.manufacturerCodeMid_3.TabIndex = 19;
+            this.manufacturerCodeMid_3.Text = "厂家代码(mid)";
+            this.manufacturerCodeMid_3.UseVisualStyleBackColor = true;
+            // 
+            // receiveCustomerNumber_3
+            // 
+            this.receiveCustomerNumber_3.Location = new System.Drawing.Point(540, 99);
+            this.receiveCustomerNumber_3.Name = "receiveCustomerNumber_3";
+            this.receiveCustomerNumber_3.Size = new System.Drawing.Size(100, 23);
+            this.receiveCustomerNumber_3.TabIndex = 20;
+            this.receiveCustomerNumber_3.Text = "入库单号(mid)";
+            this.receiveCustomerNumber_3.UseVisualStyleBackColor = true;
+            // 
+            // CustomerNumber_3
+            // 
+            this.CustomerNumber_3.Location = new System.Drawing.Point(646, 99);
+            this.CustomerNumber_3.Name = "CustomerNumber_3";
+            this.CustomerNumber_3.Size = new System.Drawing.Size(100, 23);
+            this.CustomerNumber_3.TabIndex = 21;
+            this.CustomerNumber_3.Text = "PO_NO(mid)";
+            this.CustomerNumber_3.UseVisualStyleBackColor = true;
+            // 
+            // time_3
+            // 
+            this.time_3.Location = new System.Drawing.Point(752, 99);
+            this.time_3.Name = "time_3";
+            this.time_3.Size = new System.Drawing.Size(100, 23);
+            this.time_3.TabIndex = 22;
+            this.time_3.Text = "DATE(DATE)";
+            this.time_3.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -249,7 +412,7 @@
 
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Button buttonDaoru;
+        private System.Windows.Forms.Button importFile;
         private System.Windows.Forms.TextBox txtDaoru;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
@@ -257,7 +420,7 @@
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button exportFile;
         private System.Windows.Forms.Button deleteUnusedColumns_1;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
@@ -265,6 +428,20 @@
         private System.Windows.Forms.Button renameSort_1;
         private System.Windows.Forms.Button partNumberMid_1;
         private System.Windows.Forms.Button test;
+        private System.Windows.Forms.Button manufacturerCodeMid_1;
+        private System.Windows.Forms.Button deleteUnusedColumns_2;
+        private System.Windows.Forms.Button renameSort_2;
+        private System.Windows.Forms.Button orderNumber_2;
+        private System.Windows.Forms.Button manufacturerCodeMid_2;
+        private System.Windows.Forms.Button partNumberMid_2;
+        private System.Windows.Forms.Button time_2;
+        private System.Windows.Forms.Button time_3;
+        private System.Windows.Forms.Button CustomerNumber_3;
+        private System.Windows.Forms.Button receiveCustomerNumber_3;
+        private System.Windows.Forms.Button manufacturerCodeMid_3;
+        private System.Windows.Forms.Button partNumberMid_3;
+        private System.Windows.Forms.Button renameSort_3;
+        private System.Windows.Forms.Button deleteUnusedColumns_3;
     }
 }
 
