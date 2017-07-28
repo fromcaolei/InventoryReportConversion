@@ -28,7 +28,7 @@ namespace InventoryReportConversion
             openFileDialog1.InitialDirectory = @"C:\Users\Administrator\Desktop\InventoryReportConversion\原表";
             openFileDialog1.FileName = "";
 
-            saveFileDialog1.Filter = "Excel 2007 工作簿(*.xlsx)|*.xlsx|CSV(逗号分隔)(*.csv)|*.csv";  //设置可保存文件的类型
+            saveFileDialog1.Filter = "Excel 工作簿(*.xls)|*.xls|CSV(逗号分隔)(*.csv)|*.csv";  //设置可保存文件的类型
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -40,7 +40,7 @@ namespace InventoryReportConversion
             dataGridView1.EnableHeadersVisualStyles = false;
         }
 
-        #region 被事件处理函数调用的众多方法
+        #region 被事件处理函数调用的一些方法
 
         /// <summary>
         /// 用于跨线程将数据表传递到dataGridView中
@@ -94,19 +94,16 @@ namespace InventoryReportConversion
         }
 
         /// <summary>
-        /// 把DataTable转换成Excel 2007文件，且只有一个sheet
+        /// 把DataTable转换成Excel文件，且只有一个sheet
         /// </summary>
-        private void ExportToExcel(DataTable dt, string addr)
-        {
-            
-        }
-
-        //从DataView导出,能用，但有科学计数问题/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        public void Export(ref DataGridView datagrid)
+        /// <param name="datagrid">所要导出的DataGridView引用</param>
+        public void ExportToExcel(ref DataGridView datagrid)
         {
             SaveFileDialog dlg = new SaveFileDialog();
-            //dlg.Filter = "CSV文件(*.csv)|*.csv|文本文件(*.txt)|*.txt|Excel 2007 工作簿(*.xlsx)|*.xlsx";
-            dlg.Filter = "CSV文件(*.csv)|*.csv|文本文件(*.txt)|*.txt";
+            dlg.Filter = "CSV文件(*.csv)|*.csv|文本文件(*.txt)|*.txt|Excel 工作簿(*.xls)|*.xls";
+            dlg.FileName = Path.GetFileNameWithoutExtension(filename);
+            dlg.FilterIndex = 3;
+
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 try
@@ -230,54 +227,79 @@ namespace InventoryReportConversion
                     {
                         try
                         {
-                            #region 导出EXCEL文件
-                            //Microsoft.Office.Interop.Excel.ApplicationClass app = new Microsoft.Office.Interop.Excel.ApplicationClass();
-                            //app.Sheets.Add();
+                            #region 导出Excel文件
 
-                            ////StreamWriter write = new StreamWriter(dlg.FileName, false, Encoding.Default, size * sizeCnt)
-                            //StreamWriter write = new StreamWriter(dlg.FileName, false, Encoding.Default);
+                            Microsoft.Office.Interop.Excel.ApplicationClass app = new Microsoft.Office.Interop.Excel.ApplicationClass();
 
-                            ////标题
-                            //for (int t = 0; t < datagrid.ColumnCount; t++)
-                            //{
-                            //    if (datagrid.Columns[t].Visible == true)
-                            //    {
-                            //        write.Write(datagrid.Columns[t].HeaderText + ",");
-                            //    }
-                            //}
-                            //write.WriteLine();
+                            System.Globalization.CultureInfo CurrentCI = System.Threading.Thread.CurrentThread.CurrentCulture;
+                            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+                            Microsoft.Office.Interop.Excel.Workbooks workbooks = app.Workbooks;
+                            Microsoft.Office.Interop.Excel.Workbook workbook = workbooks.Add(Microsoft.Office.Interop.Excel.XlWBATemplate.xlWBATWorksheet);
+                            Microsoft.Office.Interop.Excel.Worksheet worksheet = (Microsoft.Office.Interop.Excel.Worksheet)workbook.Worksheets[1];
+                            Microsoft.Office.Interop.Excel.Range range;
 
-                            ////明细
-                            //for (int Lin = 2; Lin <= datagrid.RowCount + 1; Lin++)
-                            //{
-                            //    if (datagrid.Rows[Lin - 2].Visible == true)
-                            //    {
-                            //        string Tem = "";
-                            //        for (int k = 0; k < datagrid.ColumnCount; k++)
-                            //        {
-                            //            if (datagrid.Columns[k].Visible == true)
-                            //            {
-                            //                if (datagrid.Rows[Lin - 2].Cells[k].Value != null)
-                            //                {
-                            //                    string TemString = datagrid.Rows[Lin - 2].Cells[k].Value.ToString().Trim().Replace(',', '.');
+                            app.Visible = false;
+                            app.DisplayAlerts = false;
+                            app.AlertBeforeOverwriting = false;
 
-                            //                    Tem += TemString;
-                            //                    Tem += ",";
-                            //                }
-                            //                else
-                            //                {
-                            //                    string TemString = " ";
-                            //                    Tem += TemString;
-                            //                    Tem += ",";
-                            //                }
-                            //            }
-                            //        }
-                            //        write.WriteLine(Tem);
-                            //    }
-                            //}
 
-                            //write.Flush();
-                            //write.Close();
+
+                            //标题
+                            int ColCnt = 0;
+                            for (int indexCol = 0; indexCol < datagrid.ColumnCount; indexCol++)
+                            {
+                                if (datagrid.Columns[indexCol].Visible == true)
+                                {
+                                    //worksheet.Cells[1, indexCol + 1] = datagrid.Columns[indexCol].HeaderText;  //开启本行，将DataGridView中的表头做进表里
+                                    ColCnt++;
+                                }
+                            }
+
+                            object[,] data = new object[datagrid.RowCount, ColCnt];
+
+                            //明细
+                            for (int curIndexRow = 0; curIndexRow < datagrid.RowCount; curIndexRow++)
+                            {
+                                int curIndex = 0;
+                                //range = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[1, ColCnt];
+
+                                for (int curIndexCol = 0; curIndexCol < datagrid.ColumnCount; curIndexCol++)
+                                {
+                                    try
+                                    {
+                                        if (datagrid.Columns[curIndexCol].Visible == true)
+                                        {
+                                            //worksheet.Cells[curIndexRow+2, curIndex] = "";
+                                            //if (datagrid.Rows[curIndexRow].Cells[curIndexCol].Value != DBNull.Value)
+                                            //    worksheet.Cells[curIndexRow + 2, curIndex] = datagrid.Rows[curIndexRow].Cells[curIndexCol].Value.ToString().Trim().Replace(',', '.');
+                                            //else
+                                            //    worksheet.Cells[curIndexRow + 2, curIndex] = "";
+
+                                            data[curIndexRow, curIndex] = datagrid.Rows[curIndexRow].Cells[curIndexCol].Value;
+
+                                            curIndex++;
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        MessageBox.Show(curIndexRow.ToString() + "-" + curIndexCol.ToString() + "-" + curIndex.ToString());
+                                    }
+                                }
+                            }
+
+                            //worksheet.get_Range("A2", worksheet.Cells[datagrid.RowCount + 1, ColCnt]).set_Value(Type.Missing, data);
+                            worksheet.get_Range("A1", worksheet.Cells[datagrid.RowCount + 1, ColCnt]).set_Value(Type.Missing, data);  //本行设置为A2，将DataGridView中的表头做进表里
+                            //保存工作表 
+                            workbook.Saved = true;
+                            workbook.SaveCopyAs(dlg.FileName);
+
+                            app.Workbooks.Close();
+                            app.Quit();
+                            worksheet = null;
+                            workbook = null;
+                            app = null;
+
+                            GC.Collect();
 
                             #endregion
                         }
@@ -286,13 +308,14 @@ namespace InventoryReportConversion
                             MessageBox.Show(ex.Message);
                         }
                     }
+
+                    MessageBox.Show("导出完毕！");
+
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message);
                 }
-
-                MessageBox.Show("导出完毕！");
             }
         }
 
@@ -386,11 +409,10 @@ namespace InventoryReportConversion
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 filename = openFileDialog1.FileName;
-                saveFileDialog1.FileName = new FileInfo(filename).Name;  //保存一个不包含路径的文件名，导出时不需要重新输入名称
                 this.Text = new FileInfo(filename).Name + " - 库存日报表数据格式转换";  //修改一下标题栏
-                if (filename.IndexOf(".xlsx", filename.Length - 5, 5) == -1)
+                if (filename.IndexOf(".xlsx", filename.Length - 5, 5) == -1 && filename.IndexOf(".xls", filename.Length - 4, 4) == -1)
                 {
-                    MessageBox.Show("错误：导入的文件非xlsx类型的文件！");
+                    MessageBox.Show("错误：导入的文件非Excel类型的文件！");
                     return;
                 }
                 txtDaoru.Text = filename;
@@ -398,20 +420,21 @@ namespace InventoryReportConversion
                 Thread ds_thread = new Thread(new ParameterizedThreadStart(ExcelToDS));  //使用一个线程调用ExcelToDS方法
                 ds_thread.IsBackground = true;  //设置为后台线程，关闭主线程后，会自动关闭不会占用系统资源
                 ds_thread.Name = "ExcelToDSThread";
-                //CheckForIllegalCrossThreadCalls = false;  //为从不是创建控件的线程访问，关闭非法线程交叉调用检查，这不是标准做法！
+                //CheckForIllegalCrossThreadCalls = false;  //为从不是创建控件的线程访问，关闭非法线程交叉调用检查，这不是标准做法，只有调试时才可能使用！
                 ds_thread.Start(filename);
             }
         }
 
-        //导出已处理好的表格，未完成/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //导出已处理好的表格
         private void exportFile_Click(object sender, EventArgs e)
         {
-            //if (saveFileDialog1.ShowDialog() == DialogResult.OK)
-            //{
-            //    ExportToExcel(data_source, filename);
-            //}
+            ExportToExcel(ref dataGridView1);
 
-            Export(ref dataGridView1);
+            //Thread ds_thread = new Thread(new ParameterizedThreadStart(ExportToExcel));
+            //ds_thread.IsBackground = true;
+            //ds_thread.Name = "ExcelToDSThread";
+            ////CheckForIllegalCrossThreadCalls = false;  //为从不是创建控件的线程访问，关闭非法线程交叉调用检查，这不是标准做法，只有调试时才可能使用！
+            //ds_thread.Start(dataGridView1);
         }
 
         #region 处理库存日报表部分
@@ -573,7 +596,136 @@ namespace InventoryReportConversion
         //时间(DATE)
         private void time_2_Click(object sender, EventArgs e)
         {
+            string times;
 
+            for (int i = 1; i < data_source.Rows.Count; i++)
+            {
+                times = data_source.Rows[i]["操作时间(18)"].ToString();
+                if (times != null && times.Trim() != "")  //有些时候，导入的表会出现多一行空白行，导致报错，这里把它取消掉
+                    data_source.Rows[i]["操作时间(18)"] = Convert.ToDateTime(times).ToString("yyyy-MM-dd");
+            }
+        }
+
+        #endregion
+
+        #region 处理入库明细部分
+
+        //删除无用列
+        private void deleteUnusedColumns_3_Click(object sender, EventArgs e)
+        {
+            if (data_source != null)  //查找关键字：优化
+            {
+                data_source.Columns.Remove("入库单号(0)");  //设置要删除的列名
+                data_source.Columns.Remove("库区(1)");
+                data_source.Columns.Remove("入库类别(2)");
+                data_source.Columns.Remove("门点(4)");
+                data_source.Columns.Remove("入库时间(5)");
+                data_source.Columns.Remove("操作员(6)");
+                data_source.Columns.Remove("操作时间(7)");
+                data_source.Columns.Remove("状态(8)");
+                data_source.Columns.Remove("备注(9)");
+                data_source.Columns.Remove("序号(10)");
+                data_source.Columns.Remove("内部编号(12)");
+                data_source.Columns.Remove("规格(14)");
+                data_source.Columns.Remove("单位(17)");
+                data_source.Columns.Remove("包装(18)");
+                data_source.Columns.Remove("单价(19)");
+                data_source.Columns.Remove("物资类别编号(21)");
+                data_source.Columns.Remove("物资类别名称(22)");
+                data_source.Columns.Remove("接收单号(23)");
+                data_source.Columns.Remove("采购单位编号(25)");
+                data_source.Columns.Remove("采购单位名称(26)");
+                data_source.Columns.Remove("配送单位编号(27)");
+                data_source.Columns.Remove("配送单位名称(28)");
+                data_source.Columns.Remove("源单号(29)");
+                data_source.Columns.Remove("源单序号(30)");
+                data_source.Columns.Remove("操作员(31)");
+                data_source.Columns.Remove("状态(33)");
+                data_source.Columns.Remove("明细备注(34)");
+                data_source.Columns.Remove("说明(35)");
+                data_source.Columns.Remove("配送类别(36)");
+                data_source.Columns.Remove("零件类别(37)");
+                data_source.Columns.Remove("库管员(38)");
+                
+                dataGridView1.DataSource = null;  //没有这一行，dataGridView的列在重新导入时，将无法恢复，每次给DataSource修改数据时最好都写上
+                dataGridView1.DataSource = data_source;
+            }
+            else
+                MessageBox.Show("请先导入出库明细文件！");
+        }
+
+        //更名与排序
+        private void renameSort_3_Click(object sender, EventArgs e)
+        {
+            data_source.Rows[0]["零件编号(11)"] = "零件图号";
+            //零件名称(13)
+            data_source.Rows[0]["入库数(20)"] = "数量";
+            data_source.Rows[0]["供应商编号(15)"] = "厂家代码";
+            data_source.Rows[0]["供应商名称(16)"] = "厂家名称";
+            data_source.Rows[0]["接收客户单号(24)"] = "入库单号";
+            data_source.Rows[0]["操作时间(32)"] = "DATE";
+            data_source.Rows[0]["客户单号(3)"] = "PO_NO";
+
+            data_source.Columns["零件编号(11)"].SetOrdinal(0);
+            data_source.Columns["零件名称(13)"].SetOrdinal(1);
+            data_source.Columns["入库数(20)"].SetOrdinal(2);
+            data_source.Columns["供应商编号(15)"].SetOrdinal(3);
+            data_source.Columns["供应商名称(16)"].SetOrdinal(4);
+            data_source.Columns["接收客户单号(24)"].SetOrdinal(5);
+            data_source.Columns["操作时间(32)"].SetOrdinal(6);
+            data_source.Columns["客户单号(3)"].SetOrdinal(7);
+
+            dataGridView1.DataSource = null;
+            dataGridView1.DataSource = data_source;
+        }
+
+        //零件图号(mid)
+        private void partNumberMid_3_Click(object sender, EventArgs e)
+        {
+            int overlength_length = 30;  //此处设定列超长时的长度，查找关键字：参数
+
+            if (GetMaxLength("零件编号(11)", overlength_length) == false)
+                SubColumn(overlength_length);
+        }
+
+        //厂家代码(mid)
+        private void manufacturerCodeMid_3_Click(object sender, EventArgs e)
+        {
+            int overlength_length = 9;  //此处设定列超长时的长度，查找关键字：参数
+
+            if (GetMaxLength("供应商编号(15)", overlength_length) == false)
+                SubColumn(overlength_length);
+        }
+
+        //入库单号(mid)
+        private void receiveCustomerNumber_3_Click(object sender, EventArgs e)
+        {
+            int overlength_length = 30;  //此处设定列超长时的长度，查找关键字：参数
+
+            if (GetMaxLength("接收客户单号(24)", overlength_length) == false)
+                SubColumn(overlength_length);
+        }
+
+        //PO_NO(mid)
+        private void CustomerNumber_3_Click(object sender, EventArgs e)
+        {
+            int overlength_length = 30;  //此处设定列超长时的长度，查找关键字：参数
+
+            if (GetMaxLength("客户单号(3)", overlength_length) == false)
+                SubColumn(overlength_length);
+        }
+
+        //DATE(DATE)
+        private void time_3_Click(object sender, EventArgs e)
+        {
+            string times;
+
+            for (int i = 1; i < data_source.Rows.Count; i++)
+            {
+                times = data_source.Rows[i]["操作时间(32)"].ToString();
+                if (times != null && times.Trim() != "")  //有些时候，导入的表会出现多一行空白行，导致报错，这里把它取消掉
+                    data_source.Rows[i]["操作时间(32)"] = Convert.ToDateTime(times).ToString("yyyy-MM-dd");
+            }
         }
 
         #endregion

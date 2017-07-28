@@ -1,8 +1,8 @@
- //从DataView导出
+        //从DataView导出
         public void Export(ref DataGridView datagrid)
         {
             SaveFileDialog dlg = new SaveFileDialog();
-            dlg.Filter = "CSV文件(*.csv)|*.csv|文本文件(*.txt)|*.txt";
+            dlg.Filter = "CSV文件(*.csv)|*.csv|文本文件(*.txt)|(*.txt)|EXCEL(*.xlsx)|*.xlsx";
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 try
@@ -127,52 +127,77 @@
                         try
                         {
                             #region 导出EXCEL文件
-                            //Microsoft.Office.Interop.Excel.ApplicationClass app = new ApplicationClass();
-                            //app.Sheets.Add();
 
-                            //StreamWriter write = new StreamWriter(dlg.FileName, false, Encoding.Default, size * sizeCnt);
+                            Microsoft.Office.Interop.Excel.ApplicationClass app = new Microsoft.Office.Interop.Excel.ApplicationClass();
+                            
+                            System.Globalization.CultureInfo CurrentCI = System.Threading.Thread.CurrentThread.CurrentCulture;
+                            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+                            Microsoft.Office.Interop.Excel.Workbooks workbooks = app.Workbooks;
+                            Microsoft.Office.Interop.Excel.Workbook workbook = workbooks.Add(Microsoft.Office.Interop.Excel.XlWBATemplate.xlWBATWorksheet);
+                            Microsoft.Office.Interop.Excel.Worksheet worksheet = (Microsoft.Office.Interop.Excel.Worksheet)workbook.Worksheets[1];
+                            Microsoft.Office.Interop.Excel.Range range;
 
-                            ////标题
-                            //for (int t = 0; t < datagrid.ColumnCount; t++)
-                            //{
-                            //    if (datagrid.Columns[t].Visible == true)
-                            //    {
-                            //        write.Write(datagrid.Columns[t].HeaderText + ",");
-                            //    }
-                            //}
-                            //write.WriteLine();
+                            app.Visible = false;
+                            app.DisplayAlerts = false;
+                            app.AlertBeforeOverwriting = false;
 
-                            ////明细
-                            //for (int Lin = 2; Lin <= datagrid.RowCount + 1; Lin++)
-                            //{
-                            //    if (datagrid.Rows[Lin - 2].Visible == true)
-                            //    {
-                            //        string Tem = "";
-                            //        for (int k = 0; k < datagrid.ColumnCount; k++)
-                            //        {
-                            //            if (datagrid.Columns[k].Visible == true)
-                            //            {
-                            //                if (datagrid.Rows[Lin - 2].Cells[k].Value != null)
-                            //                {
-                            //                    string TemString = datagrid.Rows[Lin - 2].Cells[k].Value.ToString().Trim().Replace(',', '.');
+                            
 
-                            //                    Tem += TemString;
-                            //                    Tem += ",";
-                            //                }
-                            //                else
-                            //                {
-                            //                    string TemString = " ";
-                            //                    Tem += TemString;
-                            //                    Tem += ",";
-                            //                }
-                            //            }
-                            //        }
-                            //        write.WriteLine(Tem);
-                            //    }
-                            //}
+                            //标题
+                            int ColCnt = 0;
+                            for (int indexCol = 0; indexCol < datagrid.ColumnCount; indexCol++)
+                            {
+                                if (datagrid.Columns[indexCol].Visible == true)
+                                {
+                                    worksheet.Cells[1, indexCol + 1] = datagrid.Columns[indexCol].HeaderText;
+                                    ColCnt++;
+                                }
+                            }
 
-                            //write.Flush();
-                            //write.Close();
+                            object[,] data = new object[datagrid.RowCount, ColCnt];
+
+                            //明细
+                            for (int curIndexRow = 0; curIndexRow < datagrid.RowCount; curIndexRow++)
+                            {
+                                int curIndex = 0;
+                                //range = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[1, ColCnt];
+
+                                for (int curIndexCol = 0; curIndexCol < datagrid.ColumnCount; curIndexCol++)
+                                {
+                                    try
+                                    {
+                                        if (datagrid.Columns[curIndexCol].Visible == true)
+                                        {
+                                            //worksheet.Cells[curIndexRow+2, curIndex] = "";
+                                            //if (datagrid.Rows[curIndexRow].Cells[curIndexCol].Value != DBNull.Value)
+                                            //    worksheet.Cells[curIndexRow + 2, curIndex] = datagrid.Rows[curIndexRow].Cells[curIndexCol].Value.ToString().Trim().Replace(',', '.');
+                                            //else
+                                            //    worksheet.Cells[curIndexRow + 2, curIndex] = "";
+                                            
+                                            data[curIndexRow, curIndex] = datagrid.Rows[curIndexRow].Cells[curIndexCol].Value;
+                                            
+                                            curIndex++;
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        MessageBox.Show(curIndexRow.ToString() + "-" + curIndexCol.ToString() + "-" + curIndex.ToString());
+                                    }
+                                }
+                            }
+
+                            worksheet.get_Range("A2", worksheet.Cells[datagrid.RowCount + 1, ColCnt]).set_Value(Type.Missing, data);                            
+                            //保存工作表 
+                            workbook.Saved = true;
+                            workbook.SaveCopyAs(dlg.FileName);    
+                            
+                            app.Workbooks.Close(); 
+                            app.Quit();
+                            worksheet = null;
+                            workbook = null;
+                            app = null;
+                            
+                            GC.Collect();  
 
                             #endregion
                         }
@@ -181,12 +206,13 @@
                             MessageBox.Show(ex.Message);
                         }
                     }
+                    
+                    MessageBox.Show("导出完毕！");
+
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message);
                 }
-
-                MessageBox.Show("导出完毕！");
             }
         }
