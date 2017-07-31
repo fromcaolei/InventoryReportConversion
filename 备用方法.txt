@@ -1,0 +1,294 @@
+private void DataTabletoExcel(System.Data.DataTable tmpDataTable, string strFileName)
+{
+	if (tmpDataTable == null)
+	{
+		return;
+	}
+	int rowNum = tmpDataTable.Rows.Count;
+	int columnNum = tmpDataTable.Columns.Count;
+	int rowIndex = 1;
+	int columnIndex = 0;
+	Microsoft.Office.Interop.Excel.Application xlApp = new Microsoft.Office.Interop.Excel.ApplicationClass();
+	xlApp.DefaultFilePath = "";
+	xlApp.DisplayAlerts = true;
+	xlApp.SheetsInNewWorkbook = 1;
+	Microsoft.Office.Interop.Excel.Workbook xlBook = xlApp.Workbooks.Add(true);
+	//将DataTable的列名导入Excel表第一行
+	foreach (DataColumn dc in tmpDataTable.Columns)
+	{
+		columnIndex++;
+		xlApp.Cells[rowIndex, columnIndex] = dc.ColumnName;
+	}
+	//将DataTable中的数据导入Excel中
+	for (int i = 0; i < rowNum; i++)
+	{
+		rowIndex++;
+		columnIndex = 0;
+		for (int j = 0; j < columnNum; j++)
+		{
+			columnIndex++;
+			xlApp.Cells[rowIndex, columnIndex] = tmpDataTable.Rows[i][j].ToString();
+		}
+	}
+	xlBook.SaveCopyAs(strFileName);
+}
+
+
+
+
+
+
+
+
+
+
+namespace Console.ExcelExport
+{
+    public class ExcelExport
+    {
+        public void printAll(System.Data.DataTable dt, string path)
+        {
+
+            //导出到execl  
+            try
+            {
+                //没有数据的话就不往下执行  
+                if (dt.Rows.Count == 0)
+
+                    //实例化一个Excel.Application对象  
+                    MessageBox.Show("当前没有数据！");
+
+                Microsoft.Office.Interop.Excel.Application excel = new Microsoft.Office.Interop.Excel.Application();
+
+                if (excel == null)
+                {
+                    MessageBox.Show("无法创建Excel对象，可能未安装Excel");
+                    return;
+                }
+
+                //新增加一个工作簿，Workbook是直接保存，不会弹出保存对话框，加上Application会弹出保存对话框，值为false会报错  
+                excel.Application.Workbooks.Add(true);
+
+                //让后台执行设置为不可见，为true的话会看到打开一个Excel，然后数据在往里写  
+                excel.Visible = false;
+                //生成Excel中列头名称  
+                for (int i = 0; i < dt.Columns.Count; i++)
+                {
+                    excel.Cells[1, i + 1] = dt.Columns[i].ColumnName;//输出DataGridView列头名  
+                }
+
+                //把DataGridView当前页的数据保存在Excel中  
+                if (dt.Rows.Count > 0)
+                {
+                    for (int i = 0; i < dt.Rows.Count; i++)//控制Excel中行，上下的距离，就是可以到Excel最下的行数，比数据长了报错，比数据短了会显示不完  
+                    {
+                        for (int j = 0; j < dt.Columns.Count; j++)//控制Excel中列，左右的距离，就是可以到Excel最右的列数，比数据长了报错，比数据短了会显示不完  
+                        {
+                            string str = dt.Rows[i][j].ToString();
+                            excel.Cells[i + 2, j + 1] = "'" + str;//i控制行，从Excel中第2行开始输出第一行数据，j控制列，从Excel中第1列输出第1列数据，"'" +是以string形式保存，所以遇到数字不会转成16进制  
+                        }
+                    }
+                }
+                //设置禁止弹出保存和覆盖的询问提示框  
+                excel.DisplayAlerts = false;
+                excel.AlertBeforeOverwriting = false;
+
+                //保存工作簿，值为false会报错  
+                excel.Application.Workbooks.Add(true).Save();
+                //保存excel文件  
+                //excel.Save("D:" + "\\KKHMD.xls");
+                excel.Save(path);
+
+                //确保Excel进程关闭  
+                excel.Quit();
+                excel = null;
+
+            }
+            catch (Exception)
+            {
+                //KillProcess("EXCEL");//杀死进程EXCEL 
+                //int generation = System.GC.GetGeneration(excel);
+                //excelApp = null;
+                System.GC.Collect();
+
+                //MessageBox.Show(ex.Message, "错误提示"); 
+
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+namespace HmDataPrinter
+{
+    /// <summary>
+    /// Excel操作类
+    /// </summary>
+    public class HmExcelAssist
+    {
+        public static string saveFileName = string.Empty;           // 用于保存EXCEL文件的文档名
+        public static DataTable dtDataSource = new DataTable();     // Excel数据源
+        /// <summary>
+        /// 实现DataGridView向DataTable的转换
+        /// </summary>
+        /// <param name="dvSource">DataGridView</param>
+        public static void GridViewToTable(DataGridView dvSource)
+        {
+            dtDataSource = new DataTable();
+
+            DataColumn col;                     // 设置列
+            for (int i = 0; i < dvSource.Columns.Count; i++)
+            {
+                col = new DataColumn();
+                col.ColumnName = dvSource.Columns[i].HeaderText;
+                dtDataSource.Columns.Add(col);
+            }
+
+            DataRow dr;                         // 设置行
+            for (int i = 0; i < dvSource.Rows.Count; i++)
+            {
+                dr = dtDataSource.NewRow();
+                for (int j = 0; j < dvSource.Columns.Count; j++)
+                {
+                    dr[j] = 1 == j ? "'" + dvSource.Rows[i].Cells[j].Value.ToString() :
+                        dvSource.Rows[i].Cells[j].Value.ToString();
+                }
+                dtDataSource.Rows.Add(dr);
+            }
+        }
+        /// <summary>
+        /// 保存记录至Excel
+        /// </summary>
+        public static void SaveRecordToExcel()
+        {
+            saveFileName = string.Format("{0}{1}记录", DateTime.Now.Date.ToString("yyyyMMdd"),
+                saveFileName);                                                  // 设置默认的保存文件名
+
+            SaveFileDialog saveDialog = new SaveFileDialog();                   // 保存文件对话框
+            saveDialog.DefaultExt = "xls";
+            saveDialog.Filter = "Excel文件|*.xls";
+            saveDialog.FileName = saveFileName;
+
+            if (saveDialog.ShowDialog().Equals(DialogResult.Cancel))            // 单击了'取消'按钮,则返回
+                return;
+
+            saveFileName = saveDialog.FileName;                                 // 设置新的保存文件名
+            Thread tdSaveRecord = new Thread(new ThreadStart(SaveRecord));      // 启用线程保存数据
+            tdSaveRecord.Start();
+        }
+
+        #region Excel操作中私有的方法
+        /// <summary>
+        /// 读取信息并保存记录
+        /// </summary>
+        private static void SaveRecord()
+        {
+            string strMsg = string.Empty;                                       // 提示信息
+            MessageBoxIcon msgIcon = MessageBoxIcon.Information;                // 设置消息框的图标
+
+            if (dtDataSource.Rows.Count == 0)
+            {
+                MessageBox.Show("没有要保存的数据!", "操作提示", MessageBoxButtons.OK, msgIcon);
+                return;
+            }
+
+            if (ExportExcel())                                                  // 保存数据至Excel文件中
+            {
+                strMsg = "记录导出完毕!";
+            }
+            else
+            {
+                strMsg = "记录导出出错,请重试!";
+                msgIcon = MessageBoxIcon.Error;
+            }
+            MessageBox.Show(strMsg, "操作提示", MessageBoxButtons.OK, msgIcon);
+        }
+        /// <summary>
+        /// 将 DataTable 数据保存至 Excel 文件中
+        /// </summary>
+        private static bool ExportExcel()
+        {
+            if (saveFileName.IndexOf(":") < 0) return false; //被点了取消
+
+            Microsoft.Office.Interop.Excel.Application xlApp = new Microsoft.Office.Interop.Excel.Application();
+            object missing = System.Reflection.Missing.Value;
+
+            if (xlApp == null)
+            {
+                MessageBox.Show("无法创建Excel对象，可能您的机子未安装Excel");
+                return false;
+            }
+            Microsoft.Office.Interop.Excel.Workbooks workbooks = xlApp.Workbooks;
+            Microsoft.Office.Interop.Excel.Workbook workbook = workbooks.Add(Microsoft.Office.Interop.Excel.XlWBATemplate.xlWBATWorksheet);
+            Microsoft.Office.Interop.Excel.Worksheet worksheet = (Microsoft.Office.Interop.Excel.Worksheet)workbook.Worksheets[1];    //取得sheet1
+            Microsoft.Office.Interop.Excel.Range range;
+
+            string strCaption = saveFileName.Remove(0, saveFileName.LastIndexOf('\\') + 1);
+            strCaption = strCaption.Remove(strCaption.Length - 4, 4);
+
+            long totalCount = dtDataSource.Rows.Count;
+            long rowRead = 0;
+            float percent = 0;
+
+            range = (Microsoft.Office.Interop.Excel.Range)worksheet.get_Range(worksheet.Cells[1, 1],
+                worksheet.Cells[2, dtDataSource.Columns.Count]);                    //标题占用前两行
+            range.Merge(missing);                                                   //合并
+            range.Font.Bold = true;                                                 //粗体设置
+            range.Font.Size = 16;                                                   //字体大小设置 
+            range.HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter;              //水平对齐设置 
+            range.VerticalAlignment = Microsoft.Office.Interop.Excel.XlVAlign.xlVAlignCenter;                //垂直对齐设置
+            //range.FormulaR1C1 = 公式;             //公式设置
+            //range.ColumnWidth = 宽度;             //列宽设置
+            //range.RowHeight = 行高;               //行高  
+            worksheet.Cells[1, 1] = strCaption;
+
+            //写入字段
+            for (int i = 0; i < dtDataSource.Columns.Count; i++)
+            {
+                worksheet.Cells[4, i + 1] = dtDataSource.Columns[i].ColumnName;
+                range = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[4, i + 1];
+                range.Interior.ColorIndex = 15;
+                range.Font.Bold = true;
+            }
+
+            //写入数值
+            for (int r = 0; r < dtDataSource.Rows.Count; r++)
+            {
+                for (int i = 0; i < dtDataSource.Columns.Count; i++)
+                {
+                    worksheet.Cells[r + 5, i + 1] = dtDataSource.Rows[r][i];
+                }
+                rowRead++;
+                percent = ((float)(100 * rowRead)) / totalCount;
+                Application.DoEvents();
+            }
+            worksheet.SaveAs(saveFileName, missing, missing, missing, missing, missing, missing, missing, missing, missing);
+
+            range = worksheet.get_Range(worksheet.Cells[4, 1],
+                worksheet.Cells[dtDataSource.Rows.Count + 4, dtDataSource.Columns.Count]);
+            range.BorderAround(Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin, Microsoft.Office.Interop.Excel.XlColorIndex.xlColorIndexAutomatic, null);
+
+            range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlInsideHorizontal].ColorIndex = Microsoft.Office.Interop.Excel.XlColorIndex.xlColorIndexAutomatic;
+            range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlInsideHorizontal].LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
+            range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlInsideHorizontal].Weight = Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin;
+
+            if (dtDataSource.Columns.Count > 1)
+            {
+                range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlInsideVertical].ColorIndex = Microsoft.Office.Interop.Excel.XlColorIndex.xlColorIndexAutomatic;
+            }
+            workbook.Close(missing, missing, missing);
+            xlApp.Quit();
+
+            return true;
+        }
+        #endregion
+    }
+}

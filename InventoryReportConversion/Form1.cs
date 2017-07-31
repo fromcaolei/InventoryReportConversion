@@ -26,6 +26,8 @@ namespace InventoryReportConversion
             string dir = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);  //用Environment.SpecialFolder枚举一个特定的系统文件夹
             //openFileDialog1.InitialDirectory = dir;  //初始化openFileDialog1的初始打开位置
             openFileDialog1.InitialDirectory = @"C:\Users\Administrator\Desktop\InventoryReportConversion\原表";
+            openFileDialog1.Filter = "Excel 2007 工作簿(*.xlsx)|*.xlsx|Excel 2003 工作簿(*.xls)|*.xls|所有文件|*.*";
+            openFileDialog1.FilterIndex = 3;
             openFileDialog1.FileName = "";
 
             saveFileDialog1.Filter = "Excel 工作簿(*.xls)|*.xls|CSV(逗号分隔)(*.csv)|*.csv";  //设置可保存文件的类型
@@ -57,6 +59,10 @@ namespace InventoryReportConversion
             {
                 this.dataGridView1.DataSource = null;
                 this.dataGridView1.DataSource = dt;
+                if (data_source.Rows.Count >= 65535)
+                    MessageBox.Show("目前表格有：" + data_source.Rows.Count + "行、" + data_source.Columns.Count + "列。Excel97单个Sheet最多存储65536行、256列数据，超过这个数据请不要使用本程序！", "警告");
+                this.numberRows.Visible = true;
+                this.numberRows.Text = "当前表格记录条数：" + data_source.Rows.Count;
             }
         }
 
@@ -66,9 +72,10 @@ namespace InventoryReportConversion
         private void ExcelToDS(object Path)
         {
             DataSet ds = new DataSet();
-            //string strConn = "Provider=Microsoft.Jet.OLEDB.4.0;" + "Data Source=" + Path + ";" + "Extended Properties=Excel 8.0;";
-            //string strConn = "Provider=Microsoft.Jet.OleDb.4.0;" + "data source=" + Path + ";Extended Properties='Excel 8.0; HDR=NO; IMEX=1'"; //此连接只能操作Excel 2007之前(.xls)文件
+            //string strConn = "Provider=Microsoft.Jet.OleDb.4.0;" + "data source=" + (string)Path + ";Extended Properties='Excel 8.0; HDR=NO; IMEX=1'"; //此连接只能操作Excel 2007之前(.xls)文件
             string strConn = "Provider=Microsoft.Ace.OleDb.12.0;" + "data source=" + (string)Path + ";Extended Properties='Excel 12.0; HDR=NO; IMEX=1'";  //此连接可以操作.xls与.xlsx文件
+            //"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=D:/公司网站/gys_center/kucun/20170708库存日报表.xls;Extended Properties='Excel 8.0;HDR=Yes;IMEX=1;'"
+
             /*进度条*/this.progressBar1.BeginInvoke((Action)delegate { this.progressBar1.Visible = true; });
             /*进度条*/this.progressBar1.BeginInvoke((Action)delegate { this.progressBar1.Value = 0; });
             OleDbConnection conn = new OleDbConnection(strConn);
@@ -100,15 +107,14 @@ namespace InventoryReportConversion
         public void ExportToExcel(ref DataGridView datagrid)
         {
             SaveFileDialog dlg = new SaveFileDialog();
-            dlg.Filter = "CSV文件(*.csv)|*.csv|文本文件(*.txt)|*.txt|Excel 工作簿(*.xls)|*.xls";
+            dlg.Filter = "Excel 97 工作簿(*.xls)|*.xls|Excel 2007 工作簿(*.xlsx)|*.xlsx|CSV文件(*.csv)|*.csv|文本文件(*.txt)|*.txt";
             dlg.FileName = Path.GetFileNameWithoutExtension(filename);
-            dlg.FilterIndex = 3;
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
-                    if (dlg.FilterIndex == 1)
+                    if (dlg.FilterIndex == 3)
                     {
                         try
                         {
@@ -169,7 +175,7 @@ namespace InventoryReportConversion
                             MessageBox.Show(ex.Message);
                         }
                     }
-                    else if (dlg.FilterIndex == 2)
+                    else if (dlg.FilterIndex == 4)
                     {
                         #region 导出文本文件
                         StreamWriter write = new StreamWriter(dlg.FileName, false, Encoding.Default);
@@ -223,12 +229,12 @@ namespace InventoryReportConversion
                         write.Close();
                         #endregion
                     }
-                    else if (dlg.FilterIndex == 3)
+                    else if (dlg.FilterIndex == 1 || dlg.FilterIndex == 2)
                     {
                         try
                         {
                             #region 导出Excel文件
-
+                            
                             Microsoft.Office.Interop.Excel.ApplicationClass app = new Microsoft.Office.Interop.Excel.ApplicationClass();
 
                             System.Globalization.CultureInfo CurrentCI = System.Threading.Thread.CurrentThread.CurrentCulture;
@@ -255,7 +261,8 @@ namespace InventoryReportConversion
                                 }
                             }
 
-                            object[,] data = new object[datagrid.RowCount, ColCnt];
+                            //object[,] data = new object[datagrid.RowCount, ColCnt];  //使用object类型的数组保存的excel会出现科学计数法的问题
+                            string[,] data = new string[datagrid.RowCount, ColCnt];
 
                             //明细
                             for (int curIndexRow = 0; curIndexRow < datagrid.RowCount; curIndexRow++)
@@ -275,23 +282,28 @@ namespace InventoryReportConversion
                                             //else
                                             //    worksheet.Cells[curIndexRow + 2, curIndex] = "";
 
-                                            data[curIndexRow, curIndex] = datagrid.Rows[curIndexRow].Cells[curIndexCol].Value;
+                                            data[curIndexRow, curIndex] = datagrid.Rows[curIndexRow].Cells[curIndexCol].Value.ToString();
 
                                             curIndex++;
                                         }
                                     }
                                     catch (Exception ex)
                                     {
-                                        MessageBox.Show(curIndexRow.ToString() + "-" + curIndexCol.ToString() + "-" + curIndex.ToString());
+                                        //MessageBox.Show(curIndexRow.ToString() + "-" + curIndexCol.ToString() + "-" + curIndex.ToString());
+                                        MessageBox.Show("导出失败，错误信息：" + ex.ToString());
                                     }
                                 }
                             }
 
                             //worksheet.get_Range("A2", worksheet.Cells[datagrid.RowCount + 1, ColCnt]).set_Value(Type.Missing, data);
-                            worksheet.get_Range("A1", worksheet.Cells[datagrid.RowCount + 1, ColCnt]).set_Value(Type.Missing, data);  //本行设置为A2，将DataGridView中的表头做进表里
+                            worksheet.get_Range("A1", worksheet.Cells[datagrid.RowCount, ColCnt]).set_Value(Type.Missing, data);  //本行设置为A2，将DataGridView中的表头做进表里
                             //保存工作表 
                             workbook.Saved = true;
-                            workbook.SaveCopyAs(dlg.FileName);
+
+                            if (dlg.FilterIndex == 2)
+                                workbook.SaveAs(dlg.FileName);  //会保存为当前Excel版本的文档
+                            else if (dlg.FilterIndex == 1)
+                                workbook.SaveAs(dlg.FileName, Microsoft.Office.Interop.Excel.XlFileFormat.xlExcel8);  //可选格式的保存Excel文档
 
                             app.Workbooks.Close();
                             app.Quit();
@@ -300,12 +312,13 @@ namespace InventoryReportConversion
                             app = null;
 
                             GC.Collect();
-
+                            
                             #endregion
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show(ex.Message);
+                            MessageBox.Show("导出失败，" + ex.Message);
+                            return;
                         }
                     }
 
@@ -345,12 +358,14 @@ namespace InventoryReportConversion
 
             if (error_str == null)
             {
-                MessageBox.Show(target_str + " 列最长长度为：" + max_length, "提示");
+                //MessageBox.Show(target_str + " 列最长长度为：" + max_length, "提示");
+                numberRows.Text = target_str + " 列最长长度为：" + max_length;
                 return true;
             }
             else
             {
-                MessageBox.Show(target_str + " 列最长长度为：" + max_length + "。警告！第一个超长的单元格内容为：" + error_str, "提示");
+                //MessageBox.Show(target_str + " 列最长长度为：" + max_length + "。警告！第一个超长的单元格内容为：" + error_str, "提示");
+                numberRows.Text = target_str + " 列最长长度为：" + max_length + "。警告！第一个超长的单元格内容为：" + error_str;
                 return false;
             }
         }
@@ -359,13 +374,13 @@ namespace InventoryReportConversion
         /// 按设定的长度裁剪一列，超长部分舍弃
         /// </summary>
         /// <param name="sub_length">要求的列长度</param>
-        private void SubColumn(int sub_length)
+        private void SubColumn(string target_str, int sub_length)
         {
             //查找关键字：优化
             for (int i = 0; i < data_source.Rows.Count; i++)
             {
-                if (data_source.Rows[i][0].ToString().Length > sub_length)
-                    data_source.Rows[i][0] = data_source.Rows[i][0].ToString().Substring(0, sub_length);
+                if (data_source.Rows[i][target_str].ToString().Length > sub_length)
+                    data_source.Rows[i][target_str] = data_source.Rows[i][target_str].ToString().Substring(0, sub_length);
             }
 
             dataGridView1.DataSource = null;
@@ -397,8 +412,18 @@ namespace InventoryReportConversion
                 if (dt.Rows[j][0].ToString().Length > 5)
                     dt.Rows[j][0] = dt.Rows[j][0].ToString().Substring(0, 5);
             }
+
+            data_source = dt;
+            dataGridView1.DataSource = data_source;
+
+
+
+            Microsoft.Office.Interop.Excel.Application test = new Microsoft.Office.Interop.Excel.Application();
+            MessageBox.Show(test.Version.ToString());
+            test.Quit();
+            test = null;
             
-            dataGridView1.DataSource = dt;
+            
 
             //new DTE.DataToExcel().OutputExcel(dt, "abc", @"C:\Users\Administrator\Desktop");
         }
@@ -428,13 +453,17 @@ namespace InventoryReportConversion
         //导出已处理好的表格
         private void exportFile_Click(object sender, EventArgs e)
         {
+            //saveFileDialog1.Filter = "CSV文件(*.csv)|*.csv|文本文件(*.txt)|*.txt|Excel 工作簿(*.xls)|*.xls";
+            //saveFileDialog1.FileName = Path.GetFileNameWithoutExtension(filename);
+            //saveFileDialog1.FilterIndex = 3;
+
             ExportToExcel(ref dataGridView1);
 
-            //Thread ds_thread = new Thread(new ParameterizedThreadStart(ExportToExcel));
-            //ds_thread.IsBackground = true;
+            //Thread ds_thread = new Thread(new ParameterizedThreadStart(ExcelToDS));  //使用一个线程调用ExcelToDS方法
+            //ds_thread.IsBackground = true;  //设置为后台线程，关闭主线程后，会自动关闭不会占用系统资源
             //ds_thread.Name = "ExcelToDSThread";
             ////CheckForIllegalCrossThreadCalls = false;  //为从不是创建控件的线程访问，关闭非法线程交叉调用检查，这不是标准做法，只有调试时才可能使用！
-            //ds_thread.Start(dataGridView1);
+            //ds_thread.Start(filename);
         }
 
         #region 处理库存日报表部分
@@ -476,18 +505,20 @@ namespace InventoryReportConversion
         private void partNumberMid_1_Click(object sender, EventArgs e)
         {
             int overlength_length = 30;  //此处设定列超长时的长度，查找关键字：参数
+            string target_str = "零件编号(1)";
 
-            if (GetMaxLength("零件编号(1)", overlength_length) == false)
-                SubColumn(overlength_length);
+            if (GetMaxLength(target_str, overlength_length) == false)
+                SubColumn(target_str, overlength_length);
         }
 
         //厂家代码(mid)
         private void manufacturerCodeMid_1_Click(object sender, EventArgs e)
         {
             int overlength_length = 9;  //此处设定列超长时的长度，查找关键字：参数
+            string target_str = "供应商编号(3)";
 
-            if (GetMaxLength("供应商编号(3)", overlength_length) == false)
-                SubColumn(overlength_length);
+            if (GetMaxLength(target_str, overlength_length) == false)
+                SubColumn(target_str, overlength_length);
         }
 
         #endregion
@@ -570,27 +601,30 @@ namespace InventoryReportConversion
         private void partNumberMid_2_Click(object sender, EventArgs e)
         {
             int overlength_length = 30;  //此处设定列超长时的长度，查找关键字：参数
+            string target_str = "零件编号(8)";
 
-            if (GetMaxLength("零件编号(8)", overlength_length) == false)
-                SubColumn(overlength_length);
+            if (GetMaxLength(target_str, overlength_length) == false)
+                SubColumn(target_str, overlength_length);
         }
 
         //厂家代码(mid)
         private void manufacturerCodeMid_2_Click(object sender, EventArgs e)
         {
             int overlength_length = 9;  //此处设定列超长时的长度，查找关键字：参数
+            string target_str = "供应商编号(13)";
 
-            if (GetMaxLength("供应商编号(13)", overlength_length) == false)
-                SubColumn(overlength_length);
+            if (GetMaxLength(target_str, overlength_length) == false)
+                SubColumn(target_str, overlength_length);
         }
 
         //订单号(mid)
         private void orderNumber_2_Click(object sender, EventArgs e)
         {
             int overlength_length = 30;  //此处设定列超长时的长度，查找关键字：参数
+            string target_str = "客户单号(3)";
 
-            if (GetMaxLength("客户单号(3)", overlength_length) == false)
-                SubColumn(overlength_length);
+            if (GetMaxLength(target_str, overlength_length) == false)
+                SubColumn(target_str, overlength_length);
         }
 
         //时间(DATE)
@@ -683,36 +717,40 @@ namespace InventoryReportConversion
         private void partNumberMid_3_Click(object sender, EventArgs e)
         {
             int overlength_length = 30;  //此处设定列超长时的长度，查找关键字：参数
+            string target_str = "零件编号(11)";
 
-            if (GetMaxLength("零件编号(11)", overlength_length) == false)
-                SubColumn(overlength_length);
+            if (GetMaxLength(target_str, overlength_length) == false)
+                SubColumn(target_str, overlength_length);
         }
 
         //厂家代码(mid)
         private void manufacturerCodeMid_3_Click(object sender, EventArgs e)
         {
             int overlength_length = 9;  //此处设定列超长时的长度，查找关键字：参数
+            string target_str = "供应商编号(15)";
 
-            if (GetMaxLength("供应商编号(15)", overlength_length) == false)
-                SubColumn(overlength_length);
+            if (GetMaxLength(target_str, overlength_length) == false)
+                SubColumn(target_str, overlength_length);
         }
 
         //入库单号(mid)
         private void receiveCustomerNumber_3_Click(object sender, EventArgs e)
         {
             int overlength_length = 30;  //此处设定列超长时的长度，查找关键字：参数
+            string target_str = "接收客户单号(24)";
 
-            if (GetMaxLength("接收客户单号(24)", overlength_length) == false)
-                SubColumn(overlength_length);
+            if (GetMaxLength(target_str, overlength_length) == false)
+                SubColumn(target_str, overlength_length);
         }
 
         //PO_NO(mid)
         private void CustomerNumber_3_Click(object sender, EventArgs e)
         {
             int overlength_length = 30;  //此处设定列超长时的长度，查找关键字：参数
+            string target_str = "客户单号(3)";
 
-            if (GetMaxLength("客户单号(3)", overlength_length) == false)
-                SubColumn(overlength_length);
+            if (GetMaxLength(target_str, overlength_length) == false)
+                SubColumn(target_str, overlength_length);
         }
 
         //DATE(DATE)

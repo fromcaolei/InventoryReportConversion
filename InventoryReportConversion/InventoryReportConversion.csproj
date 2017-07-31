@@ -35,8 +35,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Office.Interop.Excel%28Version11%29">
-      <HintPath>Components\Microsoft.Office.Interop.Excel(Version11).dll</HintPath>
+    <Reference Include="Microsoft.Office.Interop.Excel%28Version12%29">
+      <HintPath>Components\Microsoft.Office.Interop.Excel(Version12).dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="System" />

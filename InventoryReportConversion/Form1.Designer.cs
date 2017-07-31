@@ -60,6 +60,7 @@
             this.exportFile = new System.Windows.Forms.Button();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.numberRows = new System.Windows.Forms.Label();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -364,6 +365,7 @@
             // 
             // panel3
             // 
+            this.panel3.Controls.Add(this.numberRows);
             this.panel3.Controls.Add(this.progressBar1);
             this.panel3.Controls.Add(this.exportFile);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -374,7 +376,8 @@
             // 
             // progressBar1
             // 
-            this.progressBar1.Location = new System.Drawing.Point(9, 6);
+            this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressBar1.Location = new System.Drawing.Point(854, 3);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(148, 23);
             this.progressBar1.TabIndex = 1;
@@ -395,6 +398,16 @@
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
+            // numberRows
+            // 
+            this.numberRows.AutoSize = true;
+            this.numberRows.Location = new System.Drawing.Point(9, 8);
+            this.numberRows.Name = "numberRows";
+            this.numberRows.Size = new System.Drawing.Size(29, 12);
+            this.numberRows.TabIndex = 1;
+            this.numberRows.Text = "行数";
+            this.numberRows.Visible = false;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -411,6 +424,7 @@
             this.panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.panel3.ResumeLayout(false);
+            this.panel3.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -449,6 +463,7 @@
         private System.Windows.Forms.Button partNumberMid_3;
         private System.Windows.Forms.Button renameSort_3;
         private System.Windows.Forms.Button deleteUnusedColumns_3;
+        private System.Windows.Forms.Label numberRows;
     }
 }
 
