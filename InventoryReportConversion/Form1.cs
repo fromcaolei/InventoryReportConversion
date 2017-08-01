@@ -31,8 +31,8 @@ namespace InventoryReportConversion
             InitializeComponent();
 
             string dir = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);  //用Environment.SpecialFolder枚举一个特定的系统文件夹
-            //openFileDialog1.InitialDirectory = dir;  //初始化openFileDialog1的初始打开位置
-            openFileDialog1.InitialDirectory = @"C:\Users\Administrator\Desktop\InventoryReportConversion\原表";
+            openFileDialog1.InitialDirectory = dir;  //初始化openFileDialog1的初始打开位置
+            //openFileDialog1.InitialDirectory = @"C:\Users\Administrator\Desktop\InventoryReportConversion\原表";  //不用理会，测试时使用的路径
             openFileDialog1.Filter = "Excel 2007 工作簿(*.xlsx)|*.xlsx|Excel 2003 工作簿(*.xls)|*.xls|所有文件|*.*";
             openFileDialog1.FilterIndex = 3;
             openFileDialog1.FileName = "";
@@ -47,6 +47,17 @@ namespace InventoryReportConversion
             dataGridView1.AllowUserToDeleteRows = false;
             dataGridView1.AllowUserToResizeRows = false;
             dataGridView1.EnableHeadersVisualStyles = false;
+
+            #region 屏蔽按钮功能，防止误操作
+            foreach (System.Windows.Forms.Control bt in this.panel1.Controls)
+            {
+                if (bt is System.Windows.Forms.Button)
+                    bt.Enabled = false;
+            }
+            exportFile.Enabled = false;
+            importFile.Enabled = true;
+            environmentalDetection.Enabled = true;
+            #endregion
         }
 
         #region 被事件处理函数调用的一些方法
@@ -105,6 +116,7 @@ namespace InventoryReportConversion
             //dataGridView1.DataSource = data_souce.Tables[0];  //将跨线程传递数据的代码换成使用委托，即下一行
             SetDT(data_source);
             /*进度条*/this.progressBar1.BeginInvoke((Action)delegate { this.progressBar1.Visible = false; });
+            /*导入键使能*/this.importFile.BeginInvoke((Action)delegate { this.importFile.Enabled = true; });
         }
 
         /// <summary>
@@ -320,6 +332,7 @@ namespace InventoryReportConversion
                 MessageBox.Show("导出完毕！");
 
                 /*进度条*/this.progressBar1.BeginInvoke((Action)delegate { this.progressBar1.Visible = false; });
+                /*导出键使能*/this.exportFile.BeginInvoke((Action)delegate { this.exportFile.Enabled = true; });
             }
             catch (Exception ex)
             {
@@ -384,58 +397,60 @@ namespace InventoryReportConversion
 
         #endregion
 
-        //测试按钮
-        private void test_Click(object sender, EventArgs e)
+        //环境检测
+        private void environmentalDetection_Click(object sender, EventArgs e)
         {
-            //MessageBox.Show("你确定要添加用户名为：“" + txt_yonghuming.Value + "” 的用户吗？", "提示", MessageBoxButtons.YesNo) == System.Windows.Forms.DialogResult.Yes
-
-            //string a = "-123456789-123456789-123456789-123456789";
-            //string b = null;
-            ////b = a.Substring(0,30);
-            //b = a.Remove(30);
-            //MessageBox.Show("A: " + a + "\nB: " + b);
-
-
-            DataTable dt = new DataTable();
-
-            dt.Columns.Add("id", typeof(string));
-            for (int i = 0; i < 30; i++)
-                dt.LoadDataRow(new object[] { "-123456789-123456789" }, true);
-
-            for (int j = 0; j < dt.Rows.Count; j++)
-            {
-                if (dt.Rows[j][0].ToString().Length > 5)
-                    dt.Rows[j][0] = dt.Rows[j][0].ToString().Substring(0, 5);
-            }
-
-            data_source = dt;
-            dataGridView1.DataSource = data_source;
-
-
-
             Microsoft.Office.Interop.Excel.Application test = new Microsoft.Office.Interop.Excel.Application();
-            MessageBox.Show(test.Version.ToString());
+            if (Convert.ToDouble(test.Version) >= 12.0)
+                MessageBox.Show("您的电脑装有对应Office软件，可以使用此程序", "提示：" + test.Version);
+            else
+                MessageBox.Show("您的电脑未安装Office 2007或更高版本的Office，无法使用此程序", "提示：" + test.Version);
             test.Quit();
             test = null;
-            
-            
-
-            //new DTE.DataToExcel().OutputExcel(dt, "abc", @"C:\Users\Administrator\Desktop");
         }
 
         //导入需要更改的文件
         private void importFile_Click(object sender, EventArgs e)
         {
+            #region 屏蔽按钮功能，防止误操作
+            foreach (System.Windows.Forms.Control bt in this.panel1.Controls)
+            {
+                if (bt is System.Windows.Forms.Button)
+                    bt.Enabled = false;
+            }
+            exportFile.Enabled = false;
+            importFile.Enabled = true;
+            environmentalDetection.Enabled = true;
+            #endregion
+
+            string fs = null;
+
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 filename = openFileDialog1.FileName;
-                this.Text = new FileInfo(filename).Name + " - 库存日报表数据格式转换";  //修改一下标题栏
+                fs = new FileInfo(filename).Name;
+                this.Text = fs + " - 库存日报表数据格式转换";  //修改一下标题栏
                 if (filename.IndexOf(".xlsx", filename.Length - 5, 5) == -1 && filename.IndexOf(".xls", filename.Length - 4, 4) == -1)
                 {
                     MessageBox.Show("错误：导入的文件非Excel类型的文件！");
                     return;
                 }
+
+                if (fs.IndexOf("库存日报表") != -1)
+                    deleteUnusedColumns_1.Enabled = true;
+                else if (fs.IndexOf("出库明细") != -1)
+                    deleteUnusedColumns_2.Enabled = true;
+                else if (fs.IndexOf("入库明细") != -1)
+                    deleteUnusedColumns_3.Enabled = true;
+                else
+                {
+                    MessageBox.Show("表文件名不正确，请检查您导入表的文件名！");
+                    return;
+                }
+
                 txtDaoru.Text = filename;
+
+                importFile.Enabled = false;
 
                 Thread ds_thread = new Thread(new ParameterizedThreadStart(ExcelToDS));  //使用一个线程调用ExcelToDS方法
                 ds_thread.IsBackground = true;  //设置为后台线程，关闭主线程后，会自动关闭不会占用系统资源
@@ -448,16 +463,14 @@ namespace InventoryReportConversion
         //导出已处理好的表格
         private void exportFile_Click(object sender, EventArgs e)
         {
-            //ExportToExcel(ref dataGridView1);
-
-
-
             DataFilename df = new DataFilename();
 
             saveFileDialog1.FileName = Path.GetFileNameWithoutExtension(filename);
 
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
+                exportFile.Enabled = false;
+
                 df.index = saveFileDialog1.FilterIndex;
                 df.fileName = saveFileDialog1.FileName;
                 df.dataGrid = dataGridView1;
@@ -489,9 +502,12 @@ namespace InventoryReportConversion
 
                 dataGridView1.DataSource = null;  //没有这一行，dataGridView的列在重新导入时，将无法恢复，每次给DataSource修改数据时最好都写上
                 dataGridView1.DataSource = data_source;
+
+                deleteUnusedColumns_1.Enabled = false;
+                renameSort_1.Enabled = true;
             }
             else
-                MessageBox.Show("请先导入库存日报表文件！");
+                MessageBox.Show("请先等待库存日报表文件导入完毕！");
         }
 
         //更名与排序
@@ -504,6 +520,9 @@ namespace InventoryReportConversion
 
             dataGridView1.DataSource = null;
             dataGridView1.DataSource = data_source;
+
+            renameSort_1.Enabled = false;
+            partNumberMid_1.Enabled = true;
         }
 
         //零件图号(mid)
@@ -514,6 +533,9 @@ namespace InventoryReportConversion
 
             if (GetMaxLength(target_str, overlength_length) == false)
                 SubColumn(target_str, overlength_length);
+
+            partNumberMid_1.Enabled = false;
+            manufacturerCodeMid_1.Enabled = true;
         }
 
         //厂家代码(mid)
@@ -524,6 +546,9 @@ namespace InventoryReportConversion
 
             if (GetMaxLength(target_str, overlength_length) == false)
                 SubColumn(target_str, overlength_length);
+
+            manufacturerCodeMid_1.Enabled = false;
+            exportFile.Enabled = true;
         }
 
         #endregion
@@ -568,9 +593,12 @@ namespace InventoryReportConversion
 
                 dataGridView1.DataSource = null;  //没有这一行，dataGridView的列在重新导入时，将无法恢复，每次给DataSource修改数据时最好都写上
                 dataGridView1.DataSource = data_source;
+
+                deleteUnusedColumns_2.Enabled = false;
+                renameSort_2.Enabled = true;
             }
             else
-                MessageBox.Show("请先导入出库明细文件！");
+                MessageBox.Show("请先等待出库明细文件导入完毕！");
 
             //此方法虽减少代码量，但过于缓慢
             //if (data_source != null)  
@@ -600,6 +628,9 @@ namespace InventoryReportConversion
 
             dataGridView1.DataSource = null;
             dataGridView1.DataSource = data_source;
+
+            renameSort_2.Enabled = false;
+            partNumberMid_2.Enabled = true;
         }
 
         //零件图号(mid)
@@ -610,6 +641,9 @@ namespace InventoryReportConversion
 
             if (GetMaxLength(target_str, overlength_length) == false)
                 SubColumn(target_str, overlength_length);
+
+            partNumberMid_2.Enabled = false;
+            manufacturerCodeMid_2.Enabled = true;
         }
 
         //厂家代码(mid)
@@ -620,6 +654,9 @@ namespace InventoryReportConversion
 
             if (GetMaxLength(target_str, overlength_length) == false)
                 SubColumn(target_str, overlength_length);
+
+            manufacturerCodeMid_2.Enabled = false;
+            orderNumber_2.Enabled = true;
         }
 
         //订单号(mid)
@@ -630,19 +667,40 @@ namespace InventoryReportConversion
 
             if (GetMaxLength(target_str, overlength_length) == false)
                 SubColumn(target_str, overlength_length);
+
+            orderNumber_2.Enabled = false;
+            time_2.Enabled = true;
         }
 
         //时间(DATE)
         private void time_2_Click(object sender, EventArgs e)
         {
-            string times;
+            string times = Convert.ToDateTime(data_source.Rows[1]["操作时间(18)"].ToString()).ToString("yyyy/MM/dd");
 
-            for (int i = 1; i < data_source.Rows.Count; i++)
+            Form2 frm = new Form2();
+            frm.StartPosition = FormStartPosition.CenterScreen;
+            frm.OldTime = times;
+            frm.NewTime = times;
+            frm.ShowDialog();
+
+            if (frm.DialogResult == DialogResult.OK)
             {
-                times = data_source.Rows[i]["操作时间(18)"].ToString();
-                if (times != null && times.Trim() != "")  //有些时候，导入的表会出现多一行空白行，导致报错，这里把它取消掉
-                    data_source.Rows[i]["操作时间(18)"] = Convert.ToDateTime(times).ToString("yyyy/MM/dd");
+                for (int i = 1; i < data_source.Rows.Count; i++)
+                {
+                    if (frm.NewTime != null && frm.NewTime.Trim() != "")  //有些时候，导入的表会出现多一行空白行，导致报错，这里把它取消掉
+                        data_source.Rows[i]["操作时间(18)"] = frm.NewTime;
+                    else
+                    {
+                        MessageBox.Show("输入的时间不能为空！");
+                        return;
+                    }
+                }
             }
+            else if (frm.DialogResult == DialogResult.No)
+                return;
+
+            time_2.Enabled = false;
+            exportFile.Enabled = true;
         }
 
         #endregion
@@ -688,9 +746,12 @@ namespace InventoryReportConversion
                 
                 dataGridView1.DataSource = null;  //没有这一行，dataGridView的列在重新导入时，将无法恢复，每次给DataSource修改数据时最好都写上
                 dataGridView1.DataSource = data_source;
+
+                deleteUnusedColumns_3.Enabled = false;
+                renameSort_3.Enabled = true;
             }
             else
-                MessageBox.Show("请先导入出库明细文件！");
+                MessageBox.Show("请先等待出库明细文件导入完毕");
         }
 
         //更名与排序
@@ -716,6 +777,9 @@ namespace InventoryReportConversion
 
             dataGridView1.DataSource = null;
             dataGridView1.DataSource = data_source;
+
+            renameSort_3.Enabled = false;
+            partNumberMid_3.Enabled = true;
         }
 
         //零件图号(mid)
@@ -726,6 +790,9 @@ namespace InventoryReportConversion
 
             if (GetMaxLength(target_str, overlength_length) == false)
                 SubColumn(target_str, overlength_length);
+
+            partNumberMid_3.Enabled = false;
+            manufacturerCodeMid_3.Enabled = true;
         }
 
         //厂家代码(mid)
@@ -736,6 +803,9 @@ namespace InventoryReportConversion
 
             if (GetMaxLength(target_str, overlength_length) == false)
                 SubColumn(target_str, overlength_length);
+
+            manufacturerCodeMid_3.Enabled = false;
+            receiveCustomerNumber_3.Enabled = true;
         }
 
         //入库单号(mid)
@@ -746,6 +816,9 @@ namespace InventoryReportConversion
 
             if (GetMaxLength(target_str, overlength_length) == false)
                 SubColumn(target_str, overlength_length);
+
+            receiveCustomerNumber_3.Enabled = false;
+            CustomerNumber_3.Enabled = true;
         }
 
         //PO_NO(mid)
@@ -756,19 +829,40 @@ namespace InventoryReportConversion
 
             if (GetMaxLength(target_str, overlength_length) == false)
                 SubColumn(target_str, overlength_length);
+
+            CustomerNumber_3.Enabled = false;
+            time_3.Enabled = true;
         }
 
         //DATE(DATE)
         private void time_3_Click(object sender, EventArgs e)
         {
-            string times;
+            string times = Convert.ToDateTime(data_source.Rows[1]["操作时间(32)"].ToString()).ToString("yyyy/MM/dd");
 
-            for (int i = 1; i < data_source.Rows.Count; i++)
+            Form2 frm = new Form2();
+            frm.StartPosition = FormStartPosition.CenterScreen;
+            frm.OldTime = times;
+            frm.NewTime = times;
+            frm.ShowDialog();
+
+            if (frm.DialogResult == DialogResult.OK)
             {
-                times = data_source.Rows[i]["操作时间(32)"].ToString();
-                if (times != null && times.Trim() != "")  //有些时候，导入的表会出现多一行空白行，导致报错，这里把它取消掉
-                    data_source.Rows[i]["操作时间(32)"] = Convert.ToDateTime(times).ToString("yyyy/MM/dd");
+                for (int i = 1; i < data_source.Rows.Count; i++)
+                {
+                    if (frm.NewTime != null && frm.NewTime.Trim() != "")  //有些时候，导入的表会出现多一行空白行，导致报错，这里把它取消掉
+                        data_source.Rows[i]["操作时间(32)"] = frm.NewTime;
+                    else
+                    {
+                        MessageBox.Show("输入的时间不能为空！");
+                        return;
+                    }
+                }
             }
+            else if (frm.DialogResult == DialogResult.No)
+                return;
+
+            time_3.Enabled = false;
+            exportFile.Enabled = true;
         }
 
         #endregion

@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventoryReportConversion", "InventoryReportConversion\InventoryReportConversion.csproj", "{6F2631BA-0C12-4F7F-80E1-AAA86DF7A0D0}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "InventoryReportConversionSetup", "InventoryReportConversionSetup\InventoryReportConversionSetup.vdproj", "{080B859F-574B-4084-ABA7-B86D10DEEA7F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,12 @@ Global
 		{6F2631BA-0C12-4F7F-80E1-AAA86DF7A0D0}.Release|Mixed Platforms.Build.0 = Release|x86
 		{6F2631BA-0C12-4F7F-80E1-AAA86DF7A0D0}.Release|x86.ActiveCfg = Release|x86
 		{6F2631BA-0C12-4F7F-80E1-AAA86DF7A0D0}.Release|x86.Build.0 = Release|x86
+		{080B859F-574B-4084-ABA7-B86D10DEEA7F}.Debug|Any CPU.ActiveCfg = Debug
+		{080B859F-574B-4084-ABA7-B86D10DEEA7F}.Debug|Mixed Platforms.ActiveCfg = Debug
+		{080B859F-574B-4084-ABA7-B86D10DEEA7F}.Debug|x86.ActiveCfg = Debug
+		{080B859F-574B-4084-ABA7-B86D10DEEA7F}.Release|Any CPU.ActiveCfg = Release
+		{080B859F-574B-4084-ABA7-B86D10DEEA7F}.Release|Mixed Platforms.ActiveCfg = Release
+		{080B859F-574B-4084-ABA7-B86D10DEEA7F}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

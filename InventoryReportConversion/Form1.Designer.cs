@@ -44,7 +44,7 @@
             this.renameSort_2 = new System.Windows.Forms.Button();
             this.deleteUnusedColumns_2 = new System.Windows.Forms.Button();
             this.manufacturerCodeMid_1 = new System.Windows.Forms.Button();
-            this.test = new System.Windows.Forms.Button();
+            this.environmentalDetection = new System.Windows.Forms.Button();
             this.partNumberMid_1 = new System.Windows.Forms.Button();
             this.renameSort_1 = new System.Windows.Forms.Button();
             this.deleteUnusedColumns_1 = new System.Windows.Forms.Button();
@@ -56,11 +56,11 @@
             this.panel2 = new System.Windows.Forms.Panel();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.numberRows = new System.Windows.Forms.Label();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.exportFile = new System.Windows.Forms.Button();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.numberRows = new System.Windows.Forms.Label();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -101,7 +101,7 @@
             this.panel1.Controls.Add(this.renameSort_2);
             this.panel1.Controls.Add(this.deleteUnusedColumns_2);
             this.panel1.Controls.Add(this.manufacturerCodeMid_1);
-            this.panel1.Controls.Add(this.test);
+            this.panel1.Controls.Add(this.environmentalDetection);
             this.panel1.Controls.Add(this.partNumberMid_1);
             this.panel1.Controls.Add(this.renameSort_1);
             this.panel1.Controls.Add(this.deleteUnusedColumns_1);
@@ -256,16 +256,16 @@
             this.manufacturerCodeMid_1.UseVisualStyleBackColor = true;
             this.manufacturerCodeMid_1.Click += new System.EventHandler(this.manufacturerCodeMid_1_Click);
             // 
-            // test
+            // environmentalDetection
             // 
-            this.test.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.test.Location = new System.Drawing.Point(745, 7);
-            this.test.Name = "test";
-            this.test.Size = new System.Drawing.Size(75, 23);
-            this.test.TabIndex = 8;
-            this.test.Text = "测试功能";
-            this.test.UseVisualStyleBackColor = true;
-            this.test.Click += new System.EventHandler(this.test_Click);
+            this.environmentalDetection.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.environmentalDetection.Location = new System.Drawing.Point(745, 7);
+            this.environmentalDetection.Name = "environmentalDetection";
+            this.environmentalDetection.Size = new System.Drawing.Size(75, 23);
+            this.environmentalDetection.TabIndex = 8;
+            this.environmentalDetection.Text = "环境检测";
+            this.environmentalDetection.UseVisualStyleBackColor = true;
+            this.environmentalDetection.Click += new System.EventHandler(this.environmentalDetection_Click);
             // 
             // partNumberMid_1
             // 
@@ -374,6 +374,16 @@
             this.panel3.Size = new System.Drawing.Size(1050, 34);
             this.panel3.TabIndex = 2;
             // 
+            // numberRows
+            // 
+            this.numberRows.AutoSize = true;
+            this.numberRows.Location = new System.Drawing.Point(9, 8);
+            this.numberRows.Name = "numberRows";
+            this.numberRows.Size = new System.Drawing.Size(29, 12);
+            this.numberRows.TabIndex = 1;
+            this.numberRows.Text = "行数";
+            this.numberRows.Visible = false;
+            // 
             // progressBar1
             // 
             this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -397,16 +407,6 @@
             // openFileDialog1
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
-            // 
-            // numberRows
-            // 
-            this.numberRows.AutoSize = true;
-            this.numberRows.Location = new System.Drawing.Point(9, 8);
-            this.numberRows.Name = "numberRows";
-            this.numberRows.Size = new System.Drawing.Size(29, 12);
-            this.numberRows.TabIndex = 1;
-            this.numberRows.Text = "行数";
-            this.numberRows.Visible = false;
             // 
             // Form1
             // 
@@ -448,7 +448,7 @@
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Button renameSort_1;
         private System.Windows.Forms.Button partNumberMid_1;
-        private System.Windows.Forms.Button test;
+        private System.Windows.Forms.Button environmentalDetection;
         private System.Windows.Forms.Button manufacturerCodeMid_1;
         private System.Windows.Forms.Button deleteUnusedColumns_2;
         private System.Windows.Forms.Button renameSort_2;
