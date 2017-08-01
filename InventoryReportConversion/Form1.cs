@@ -12,6 +12,13 @@ using System.IO;
 
 namespace InventoryReportConversion
 {
+    struct DataFilename
+    {
+        public int index;
+        public string fileName;
+        public DataGridView dataGrid;
+    }
+
     public partial class Form1 : Form
     {
         private string filename = "Untitled";  //选中的文件路径
@@ -30,7 +37,7 @@ namespace InventoryReportConversion
             openFileDialog1.FilterIndex = 3;
             openFileDialog1.FileName = "";
 
-            saveFileDialog1.Filter = "Excel 工作簿(*.xls)|*.xls|CSV(逗号分隔)(*.csv)|*.csv";  //设置可保存文件的类型
+            saveFileDialog1.Filter = "Excel 97 工作簿(*.xls)|*.xls|Excel 2007 工作簿(*.xlsx)|*.xlsx|CSV文件(*.csv)|*.csv|文本文件(*.txt)|*.txt";
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -74,7 +81,7 @@ namespace InventoryReportConversion
             DataSet ds = new DataSet();
             //string strConn = "Provider=Microsoft.Jet.OleDb.4.0;" + "data source=" + (string)Path + ";Extended Properties='Excel 8.0; HDR=NO; IMEX=1'"; //此连接只能操作Excel 2007之前(.xls)文件
             string strConn = "Provider=Microsoft.Ace.OleDb.12.0;" + "data source=" + (string)Path + ";Extended Properties='Excel 12.0; HDR=NO; IMEX=1'";  //此连接可以操作.xls与.xlsx文件
-            //"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=D:/公司网站/gys_center/kucun/20170708库存日报表.xls;Extended Properties='Excel 8.0;HDR=Yes;IMEX=1;'"
+            //"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=D:/公司网站/gys_center/kucun/20170708库存日报表.xls;Extended Properties='Excel 8.0;HDR=Yes;IMEX=1;'"  //网站使用的连接字符串
 
             /*进度条*/this.progressBar1.BeginInvoke((Action)delegate { this.progressBar1.Visible = true; });
             /*进度条*/this.progressBar1.BeginInvoke((Action)delegate { this.progressBar1.Value = 0; });
@@ -95,7 +102,7 @@ namespace InventoryReportConversion
                 data_source.Columns[i].ColumnName = data_source.Rows[0][i].ToString() + "(" + i.ToString() + ")";
             }
 
-            //dataGridView1.DataSource = data_souce.Tables[0];  //将跨线程传递数据的代码换成使用委托
+            //dataGridView1.DataSource = data_souce.Tables[0];  //将跨线程传递数据的代码换成使用委托，即下一行
             SetDT(data_source);
             /*进度条*/this.progressBar1.BeginInvoke((Action)delegate { this.progressBar1.Visible = false; });
         }
@@ -103,232 +110,220 @@ namespace InventoryReportConversion
         /// <summary>
         /// 把DataTable转换成Excel文件，且只有一个sheet
         /// </summary>
-        /// <param name="datagrid">所要导出的DataGridView引用</param>
-        public void ExportToExcel(ref DataGridView datagrid)
+        /// <param name="df">包含选中索引、文件路径、数据表控件的一个结构体</param>
+        public void ExportToExcel(object df)
         {
-            SaveFileDialog dlg = new SaveFileDialog();
-            dlg.Filter = "Excel 97 工作簿(*.xls)|*.xls|Excel 2007 工作簿(*.xlsx)|*.xlsx|CSV文件(*.csv)|*.csv|文本文件(*.txt)|*.txt";
-            dlg.FileName = Path.GetFileNameWithoutExtension(filename);
+            DataFilename dataFilename = (DataFilename)df;
 
-            if (dlg.ShowDialog() == DialogResult.OK)
+            int index = dataFilename.index;
+            string fileName = dataFilename.fileName;
+            DataGridView dataGrid = dataFilename.dataGrid;
+
+            /*进度条*/this.progressBar1.BeginInvoke((Action)delegate { this.progressBar1.Visible = true; });
+            /*进度条*/this.progressBar1.BeginInvoke((Action)delegate { this.progressBar1.Value = 0; });
+
+            try
             {
-                try
+                if (index == 1 || index == 2)
                 {
-                    if (dlg.FilterIndex == 3)
+                    try
                     {
-                        try
+                        #region 导出Excel文件
+
+                        Microsoft.Office.Interop.Excel.ApplicationClass app = new Microsoft.Office.Interop.Excel.ApplicationClass();
+
+                        System.Globalization.CultureInfo CurrentCI = System.Threading.Thread.CurrentThread.CurrentCulture;
+                        System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+                        Microsoft.Office.Interop.Excel.Workbooks workbooks = app.Workbooks;
+                        Microsoft.Office.Interop.Excel.Workbook workbook = workbooks.Add(Microsoft.Office.Interop.Excel.XlWBATemplate.xlWBATWorksheet);
+                        Microsoft.Office.Interop.Excel.Worksheet worksheet = (Microsoft.Office.Interop.Excel.Worksheet)workbook.Worksheets[1];
+
+                        app.Visible = false;
+                        app.DisplayAlerts = false;
+                        app.AlertBeforeOverwriting = false;
+
+
+
+                        //标题
+                        int ColCnt = 0;
+                        for (int indexCol = 0; indexCol < dataGrid.ColumnCount; indexCol++)
                         {
-                            #region 导出CSV文件
-
-                            StreamWriter write = new StreamWriter(dlg.FileName, false, Encoding.Default);
-
-                            //标题
-                            //for (int t = 0; t < datagrid.ColumnCount; t++)
-                            //{
-                            //    if (datagrid.Columns[t].Visible == true)
-                            //    {
-                            //        write.Write(datagrid.Columns[t].HeaderText + ",");
-                            //    }
-                            //}
-
-                            //write.WriteLine();
-
-                            //明细
-                            for (int Lin = 2; Lin <= datagrid.RowCount + 1; Lin++)
+                            if (dataGrid.Columns[indexCol].Visible == true)
                             {
-                                if (datagrid.Rows[Lin - 2].Visible == true)
+                                //worksheet.Cells[1, indexCol + 1] = datagrid.Columns[indexCol].HeaderText;  //开启本行，将DataGridView中的表头做进表里
+                                ColCnt++;
+                            }
+                        }
+
+                        //object[,] data = new object[datagrid.RowCount, ColCnt];  //使用object类型的数组保存的excel会出现科学计数法的问题
+                        string[,] data = new string[dataGrid.RowCount, ColCnt];
+
+                        //明细
+                        for (int curIndexRow = 0; curIndexRow < dataGrid.RowCount; curIndexRow++)
+                        {
+                            int curIndex = 0;
+
+                            for (int curIndexCol = 0; curIndexCol < dataGrid.ColumnCount; curIndexCol++)
+                            {
+                                try
                                 {
-                                    string Tem = "";
-
-                                    for (int k = 0; k < datagrid.ColumnCount; k++)
+                                    if (dataGrid.Columns[curIndexCol].Visible == true)
                                     {
-                                        if (datagrid.Columns[k].Visible == true)
-                                        {
-                                            if (datagrid.Rows[Lin - 2].Cells[k].Value != null)
-                                            {
-                                                string TemString = datagrid.Rows[Lin - 2].Cells[k].Value.ToString().Trim().Replace(',', '.');
-
-                                                Tem += TemString;
-                                                Tem += ",";
-                                            }
-                                            else
-                                            {
-                                                string TemString = " ";
-
-                                                Tem += TemString;
-                                                Tem += ",";
-                                            }
-                                        }
+                                        data[curIndexRow, curIndex] = dataGrid.Rows[curIndexRow].Cells[curIndexCol].Value.ToString();
+                                        curIndex++;
                                     }
-
-                                    write.WriteLine(Tem);
+                                }
+                                catch (Exception ex)
+                                {
+                                    MessageBox.Show("导出失败，错误信息：" + ex.ToString());
                                 }
                             }
-
-                            write.Flush();
-                            write.Close();
-
-                            #endregion
                         }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show(ex.Message);
-                        }
+
+                        //worksheet.get_Range("A2", worksheet.Cells[datagrid.RowCount + 1, ColCnt]).set_Value(Type.Missing, data);
+                        worksheet.get_Range("A1", worksheet.Cells[dataGrid.RowCount, ColCnt]).set_Value(Type.Missing, data);  //本行设置为A2，将DataGridView中的表头做进表里
+                        
+                        workbook.Saved = true;  //保存工作表 
+
+                        /*进度条*/this.progressBar1.BeginInvoke((Action)delegate { this.progressBar1.Value = 100; });
+                        if (index == 2)
+                            workbook.SaveAs(fileName);  //会保存为当前Excel版本的文档
+                        else if (index == 1)
+                            workbook.SaveAs(fileName, Microsoft.Office.Interop.Excel.XlFileFormat.xlExcel8);  //Excel 97文档
+
+                        app.Workbooks.Close();
+                        app.Quit();
+                        worksheet = null;
+                        workbook = null;
+                        app = null;
+
+                        GC.Collect();
+
+                        #endregion
                     }
-                    else if (dlg.FilterIndex == 4)
+                    catch (Exception ex)
                     {
-                        #region 导出文本文件
-                        StreamWriter write = new StreamWriter(dlg.FileName, false, Encoding.Default);
-                        //标题行
+                        MessageBox.Show("导出失败，" + ex.Message);
+                        return;
+                    }
+                }
+                else if (index == 3)
+                {
+                    try
+                    {
+                        #region 导出CSV文件
+
+                        StreamWriter write = new StreamWriter(fileName, false, Encoding.Default);
+
+                        //标题
                         //for (int t = 0; t < datagrid.ColumnCount; t++)
                         //{
                         //    if (datagrid.Columns[t].Visible == true)
                         //    {
-                        //        write.Write(datagrid.Columns[t].HeaderText + "\t");
+                        //        write.Write(datagrid.Columns[t].HeaderText + ",");
                         //    }
                         //}
-                        //write.WriteLine();
-                        //明细行
-                        for (int Lin = 2; Lin <= datagrid.RowCount + 1; Lin++)
-                        {
 
-                            if (datagrid.Rows[Lin - 2].Visible == true)
+                        //write.WriteLine();
+
+                        //明细
+                        for (int Lin = 2; Lin <= dataGrid.RowCount + 1; Lin++)
+                        {
+                            if (dataGrid.Rows[Lin - 2].Visible == true)
                             {
                                 string Tem = "";
-                                for (int k = 0; k < datagrid.ColumnCount; k++)
+
+                                for (int k = 0; k < dataGrid.ColumnCount; k++)
                                 {
-                                    if (datagrid.Columns[k].Visible)
+                                    if (dataGrid.Columns[k].Visible == true)
                                     {
-                                        if (datagrid.Rows[Lin - 2].Cells[k].Value != null)
+                                        if (dataGrid.Rows[Lin - 2].Cells[k].Value != null)
                                         {
-                                            //if (Tem != "")
-                                            //{
-                                            //    Tem += "\t";
-                                            //}
-                                            Tem += datagrid.Rows[Lin - 2].Cells[k].Value.ToString();
-                                            Tem += "\t";
+                                            string TemString = dataGrid.Rows[Lin - 2].Cells[k].Value.ToString().Trim().Replace(',', '.');
+
+                                            Tem += TemString;
+                                            Tem += ",";
                                         }
                                         else
                                         {
-                                            string TemString = "";
-                                            //if (Tem != "")
-                                            //{
-                                            //    Tem += "\t";
-                                            //}
+                                            string TemString = " ";
 
                                             Tem += TemString;
-                                            Tem += "\t";
+                                            Tem += ",";
                                         }
                                     }
-
                                 }
+
+                                /*进度条*/this.progressBar1.BeginInvoke((Action)delegate { this.progressBar1.Value = 100; });
                                 write.WriteLine(Tem);
                             }
                         }
+
                         write.Flush();
                         write.Close();
+
                         #endregion
                     }
-                    else if (dlg.FilterIndex == 1 || dlg.FilterIndex == 2)
+                    catch (Exception ex)
                     {
-                        try
+                        MessageBox.Show(ex.Message);
+                    }
+                }
+                else if (index == 4)
+                {
+                    #region 导出文本文件
+                    StreamWriter write = new StreamWriter(fileName, false, Encoding.Default);
+                    //标题行
+                    //for (int t = 0; t < datagrid.ColumnCount; t++)
+                    //{
+                    //    if (datagrid.Columns[t].Visible == true)
+                    //    {
+                    //        write.Write(datagrid.Columns[t].HeaderText + "\t");
+                    //    }
+                    //}
+                    //write.WriteLine();
+                    //明细行
+                    for (int Lin = 2; Lin <= dataGrid.RowCount + 1; Lin++)
+                    {
+
+                        if (dataGrid.Rows[Lin - 2].Visible == true)
                         {
-                            #region 导出Excel文件
-                            
-                            Microsoft.Office.Interop.Excel.ApplicationClass app = new Microsoft.Office.Interop.Excel.ApplicationClass();
-
-                            System.Globalization.CultureInfo CurrentCI = System.Threading.Thread.CurrentThread.CurrentCulture;
-                            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
-                            Microsoft.Office.Interop.Excel.Workbooks workbooks = app.Workbooks;
-                            Microsoft.Office.Interop.Excel.Workbook workbook = workbooks.Add(Microsoft.Office.Interop.Excel.XlWBATemplate.xlWBATWorksheet);
-                            Microsoft.Office.Interop.Excel.Worksheet worksheet = (Microsoft.Office.Interop.Excel.Worksheet)workbook.Worksheets[1];
-                            Microsoft.Office.Interop.Excel.Range range;
-
-                            app.Visible = false;
-                            app.DisplayAlerts = false;
-                            app.AlertBeforeOverwriting = false;
-
-
-
-                            //标题
-                            int ColCnt = 0;
-                            for (int indexCol = 0; indexCol < datagrid.ColumnCount; indexCol++)
+                            string Tem = "";
+                            for (int k = 0; k < dataGrid.ColumnCount; k++)
                             {
-                                if (datagrid.Columns[indexCol].Visible == true)
+                                if (dataGrid.Columns[k].Visible)
                                 {
-                                    //worksheet.Cells[1, indexCol + 1] = datagrid.Columns[indexCol].HeaderText;  //开启本行，将DataGridView中的表头做进表里
-                                    ColCnt++;
-                                }
-                            }
-
-                            //object[,] data = new object[datagrid.RowCount, ColCnt];  //使用object类型的数组保存的excel会出现科学计数法的问题
-                            string[,] data = new string[datagrid.RowCount, ColCnt];
-
-                            //明细
-                            for (int curIndexRow = 0; curIndexRow < datagrid.RowCount; curIndexRow++)
-                            {
-                                int curIndex = 0;
-                                //range = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[1, ColCnt];
-
-                                for (int curIndexCol = 0; curIndexCol < datagrid.ColumnCount; curIndexCol++)
-                                {
-                                    try
+                                    if (dataGrid.Rows[Lin - 2].Cells[k].Value != null)
                                     {
-                                        if (datagrid.Columns[curIndexCol].Visible == true)
-                                        {
-                                            //worksheet.Cells[curIndexRow+2, curIndex] = "";
-                                            //if (datagrid.Rows[curIndexRow].Cells[curIndexCol].Value != DBNull.Value)
-                                            //    worksheet.Cells[curIndexRow + 2, curIndex] = datagrid.Rows[curIndexRow].Cells[curIndexCol].Value.ToString().Trim().Replace(',', '.');
-                                            //else
-                                            //    worksheet.Cells[curIndexRow + 2, curIndex] = "";
-
-                                            data[curIndexRow, curIndex] = datagrid.Rows[curIndexRow].Cells[curIndexCol].Value.ToString();
-
-                                            curIndex++;
-                                        }
+                                        Tem += dataGrid.Rows[Lin - 2].Cells[k].Value.ToString();
+                                        Tem += "\t";
                                     }
-                                    catch (Exception ex)
+                                    else
                                     {
-                                        //MessageBox.Show(curIndexRow.ToString() + "-" + curIndexCol.ToString() + "-" + curIndex.ToString());
-                                        MessageBox.Show("导出失败，错误信息：" + ex.ToString());
+                                        string TemString = "";
+
+                                        Tem += TemString;
+                                        Tem += "\t";
                                     }
                                 }
+
                             }
-
-                            //worksheet.get_Range("A2", worksheet.Cells[datagrid.RowCount + 1, ColCnt]).set_Value(Type.Missing, data);
-                            worksheet.get_Range("A1", worksheet.Cells[datagrid.RowCount, ColCnt]).set_Value(Type.Missing, data);  //本行设置为A2，将DataGridView中的表头做进表里
-                            //保存工作表 
-                            workbook.Saved = true;
-
-                            if (dlg.FilterIndex == 2)
-                                workbook.SaveAs(dlg.FileName);  //会保存为当前Excel版本的文档
-                            else if (dlg.FilterIndex == 1)
-                                workbook.SaveAs(dlg.FileName, Microsoft.Office.Interop.Excel.XlFileFormat.xlExcel8);  //可选格式的保存Excel文档
-
-                            app.Workbooks.Close();
-                            app.Quit();
-                            worksheet = null;
-                            workbook = null;
-                            app = null;
-
-                            GC.Collect();
-                            
-                            #endregion
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show("导出失败，" + ex.Message);
-                            return;
+                            /*进度条*/this.progressBar1.BeginInvoke((Action)delegate { this.progressBar1.Value = 100; });
+                            write.WriteLine(Tem);
                         }
                     }
-
-                    MessageBox.Show("导出完毕！");
-
+                    write.Flush();
+                    write.Close();
+                    #endregion
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
+
+                MessageBox.Show("导出完毕！");
+
+                /*进度条*/this.progressBar1.BeginInvoke((Action)delegate { this.progressBar1.Visible = false; });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
         }
 
@@ -364,8 +359,8 @@ namespace InventoryReportConversion
             }
             else
             {
-                //MessageBox.Show(target_str + " 列最长长度为：" + max_length + "。警告！第一个超长的单元格内容为：" + error_str, "提示");
-                numberRows.Text = target_str + " 列最长长度为：" + max_length + "。警告！第一个超长的单元格内容为：" + error_str;
+                MessageBox.Show(target_str + " 列最长长度为：" + max_length + "。警告！第一个超长的单元格内容为：" + error_str, "警告");
+                //numberRows.Text = target_str + " 列最长长度为：" + max_length + "。警告！第一个超长的单元格内容为：" + error_str;
                 return false;
             }
         }
@@ -453,17 +448,27 @@ namespace InventoryReportConversion
         //导出已处理好的表格
         private void exportFile_Click(object sender, EventArgs e)
         {
-            //saveFileDialog1.Filter = "CSV文件(*.csv)|*.csv|文本文件(*.txt)|*.txt|Excel 工作簿(*.xls)|*.xls";
-            //saveFileDialog1.FileName = Path.GetFileNameWithoutExtension(filename);
-            //saveFileDialog1.FilterIndex = 3;
+            //ExportToExcel(ref dataGridView1);
 
-            ExportToExcel(ref dataGridView1);
 
-            //Thread ds_thread = new Thread(new ParameterizedThreadStart(ExcelToDS));  //使用一个线程调用ExcelToDS方法
-            //ds_thread.IsBackground = true;  //设置为后台线程，关闭主线程后，会自动关闭不会占用系统资源
-            //ds_thread.Name = "ExcelToDSThread";
-            ////CheckForIllegalCrossThreadCalls = false;  //为从不是创建控件的线程访问，关闭非法线程交叉调用检查，这不是标准做法，只有调试时才可能使用！
-            //ds_thread.Start(filename);
+
+            DataFilename df = new DataFilename();
+
+            saveFileDialog1.FileName = Path.GetFileNameWithoutExtension(filename);
+
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                df.index = saveFileDialog1.FilterIndex;
+                df.fileName = saveFileDialog1.FileName;
+                df.dataGrid = dataGridView1;
+
+                Thread te_thread = new Thread(new ParameterizedThreadStart(ExportToExcel));
+                te_thread.IsBackground = true;
+                te_thread.Name = "ExportToExcelThread";
+                //CheckForIllegalCrossThreadCalls = false;  //为从不是创建控件的线程访问，关闭非法线程交叉调用检查，这不是标准做法，只有调试时才可能使用！
+                te_thread.Start(df);
+            }
+
         }
 
         #region 处理库存日报表部分
@@ -636,7 +641,7 @@ namespace InventoryReportConversion
             {
                 times = data_source.Rows[i]["操作时间(18)"].ToString();
                 if (times != null && times.Trim() != "")  //有些时候，导入的表会出现多一行空白行，导致报错，这里把它取消掉
-                    data_source.Rows[i]["操作时间(18)"] = Convert.ToDateTime(times).ToString("yyyy-MM-dd");
+                    data_source.Rows[i]["操作时间(18)"] = Convert.ToDateTime(times).ToString("yyyy/MM/dd");
             }
         }
 
@@ -762,7 +767,7 @@ namespace InventoryReportConversion
             {
                 times = data_source.Rows[i]["操作时间(32)"].ToString();
                 if (times != null && times.Trim() != "")  //有些时候，导入的表会出现多一行空白行，导致报错，这里把它取消掉
-                    data_source.Rows[i]["操作时间(32)"] = Convert.ToDateTime(times).ToString("yyyy-MM-dd");
+                    data_source.Rows[i]["操作时间(32)"] = Convert.ToDateTime(times).ToString("yyyy/MM/dd");
             }
         }
 
