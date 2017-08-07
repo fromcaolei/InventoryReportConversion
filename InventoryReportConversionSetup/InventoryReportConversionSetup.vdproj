@@ -63,13 +63,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_BAF52009B966471EA8C2724192D85856"
+        "MsmKey" = "8:_5F929B9CA46B4DD08F8E87887D9FAA2B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_ECA588BC2A58437391B36B37B63B6174"
+        "MsmKey" = "8:_BAF52009B966471EA8C2724192D85856"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -332,9 +332,9 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_ECA588BC2A58437391B36B37B63B6174"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5F929B9CA46B4DD08F8E87887D9FAA2B"
             {
-            "SourcePath" = "8:..\\readme.rtf"
+            "SourcePath" = "8:readme.rtf"
             "TargetName" = "8:readme.rtf"
             "Tag" = "8:"
             "Folder" = "8:_0153ED1F4A8C4408B166D53E5014D7A6"
@@ -409,7 +409,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:InventoryReportConversionSetup"
         "ProductCode" = "8:{768B36FE-5A6E-4F84-A6BE-5BD94059200F}"
-        "PackageCode" = "8:{5EEB520E-171A-4911-A678-025CF3CE7787}"
+        "PackageCode" = "8:{45662C2A-7C99-4017-A027-A68A3A55B068}"
         "UpgradeCode" = "8:{7862CADA-CFEC-4FF7-A986-FA567FF4B7F0}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -688,7 +688,7 @@
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
                             "Setting" = "3:2"
-                            "Value" = "8:_ECA588BC2A58437391B36B37B63B6174"
+                            "Value" = "8:_5F929B9CA46B4DD08F8E87887D9FAA2B"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "Sunken"
@@ -1024,7 +1024,7 @@
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
                             "Setting" = "3:2"
-                            "Value" = "8:_ECA588BC2A58437391B36B37B63B6174"
+                            "Value" = "8:_5F929B9CA46B4DD08F8E87887D9FAA2B"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "Sunken"
