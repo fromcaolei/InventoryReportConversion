@@ -22,24 +22,30 @@
         "Entry"
         {
         "MsmKey" = "8:_23D2FA130F4E83AEF2589A82F37D467B"
-        "OwnerKey" = "8:_BAF52009B966471EA8C2724192D85856"
+        "OwnerKey" = "8:_4C531A8955F51CACE1A9EFD9905E1579"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_23D2FA130F4E83AEF2589A82F37D467B"
-        "OwnerKey" = "8:_5B945B905D768E1986DEA7A084252F63"
+        "OwnerKey" = "8:_BAF52009B966471EA8C2724192D85856"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_386C1BFDDE7BFF5898040E098097A06F"
-        "OwnerKey" = "8:_5B945B905D768E1986DEA7A084252F63"
+        "OwnerKey" = "8:_BAF52009B966471EA8C2724192D85856"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_386C1BFDDE7BFF5898040E098097A06F"
+        "OwnerKey" = "8:_4C531A8955F51CACE1A9EFD9905E1579"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_40490CB54351DC01FBB858B8C56DA916"
         "OwnerKey" = "8:_BAF52009B966471EA8C2724192D85856"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -51,19 +57,19 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_40490CB54351DC01FBB858B8C56DA916"
-        "OwnerKey" = "8:_BAF52009B966471EA8C2724192D85856"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_5B945B905D768E1986DEA7A084252F63"
+        "MsmKey" = "8:_4C531A8955F51CACE1A9EFD9905E1579"
         "OwnerKey" = "8:_BAF52009B966471EA8C2724192D85856"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_5F929B9CA46B4DD08F8E87887D9FAA2B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A1F61F410F78483180EF22F2023615C4"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -82,7 +88,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_5B945B905D768E1986DEA7A084252F63"
+        "OwnerKey" = "8:_4C531A8955F51CACE1A9EFD9905E1579"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -301,14 +307,14 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_5B945B905D768E1986DEA7A084252F63"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_4C531A8955F51CACE1A9EFD9905E1579"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:Microsoft.Office.Interop.Excel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c"
                 "ScatterAssemblies"
                 {
-                    "_5B945B905D768E1986DEA7A084252F63"
+                    "_4C531A8955F51CACE1A9EFD9905E1579"
                     {
                     "Name" = "8:Microsoft.Office.Interop.Excel(Version12).dll"
                     "Attributes" = "3:512"
@@ -336,6 +342,26 @@
             {
             "SourcePath" = "8:readme.rtf"
             "TargetName" = "8:readme.rtf"
+            "Tag" = "8:"
+            "Folder" = "8:_0153ED1F4A8C4408B166D53E5014D7A6"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A1F61F410F78483180EF22F2023615C4"
+            {
+            "SourcePath" = "8:InventoryReportConversion.ico"
+            "TargetName" = "8:InventoryReportConversion.ico"
             "Tag" = "8:"
             "Folder" = "8:_0153ED1F4A8C4408B166D53E5014D7A6"
             "Condition" = "8:"
@@ -409,7 +435,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:InventoryReportConversionSetup"
         "ProductCode" = "8:{768B36FE-5A6E-4F84-A6BE-5BD94059200F}"
-        "PackageCode" = "8:{45662C2A-7C99-4017-A027-A68A3A55B068}"
+        "PackageCode" = "8:{8A6DBE05-C9DA-4DE5-9385-5B4476A74619}"
         "UpgradeCode" = "8:{7862CADA-CFEC-4FF7-A986-FA567FF4B7F0}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -531,7 +557,7 @@
         {
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_2E44FC23D63E4083B8E6EA319815BBA2"
             {
-            "Name" = "8:InventoryReportConversion"
+            "Name" = "8:报表转换"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
@@ -540,12 +566,12 @@
             "Target" = "8:_BAF52009B966471EA8C2724192D85856"
             "Folder" = "8:_D00F1843696B43D4BFCADC208B7FE444"
             "WorkingFolder" = "8:_0153ED1F4A8C4408B166D53E5014D7A6"
-            "Icon" = "8:"
+            "Icon" = "8:_A1F61F410F78483180EF22F2023615C4"
             "Feature" = "8:"
             }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_D8AABEFBF6D349F582F24023B4AC0A83"
             {
-            "Name" = "8:InventoryReportConversion"
+            "Name" = "8:报表转换"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
@@ -554,7 +580,7 @@
             "Target" = "8:_BAF52009B966471EA8C2724192D85856"
             "Folder" = "8:_8ACF40F0894C454D8F24333D6E2967C7"
             "WorkingFolder" = "8:_0153ED1F4A8C4408B166D53E5014D7A6"
-            "Icon" = "8:"
+            "Icon" = "8:_A1F61F410F78483180EF22F2023615C4"
             "Feature" = "8:"
             }
         }
