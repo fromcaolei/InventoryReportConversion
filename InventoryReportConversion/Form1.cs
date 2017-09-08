@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Data.OleDb;
 using System.Threading;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace InventoryReportConversion
 {
@@ -99,9 +100,8 @@ namespace InventoryReportConversion
             OleDbConnection conn = new OleDbConnection(strConn);
             conn.Open();
             /*进度条*/this.progressBar1.BeginInvoke((Action)delegate { this.progressBar1.Value = 10; });
-            string strExcel = "";
+            string strExcel = "select * from [sheet1$]";
             OleDbDataAdapter myCommand = null;
-            strExcel = "select * from [sheet1$]";
             myCommand = new OleDbDataAdapter(strExcel, strConn);
             /*进度条*/this.progressBar1.BeginInvoke((Action)delegate { this.progressBar1.Value = 100; });
             myCommand.Fill(ds, "table1");
@@ -341,7 +341,7 @@ namespace InventoryReportConversion
         }
 
         /// <summary>
-        /// 打印当前导入表格DataTable中的最大长度，并在超过指定长度时警告,超长返回false
+        /// 打印当前导入表格DataTable中的最大长度，并在超过指定长度时返回false，出现科学计数法但不超长返回true，无任何错误返回true
         /// </summary>
         /// <param name="target_str">所查询列的列名</param>
         /// <param name="notice_length">用来做警告的最大长度</param> 
@@ -349,8 +349,8 @@ namespace InventoryReportConversion
         {
             //查找关键字：优化
             int max_length = 0;
-            bool only_once = true;
-            string error_str = null;
+            bool only_once = true, only_once2 = true;
+            string error_str = null, error_str2 = null;
             for (int i = 1; i < data_source.Rows.Count; i++)
             {
                 if (data_source.Rows[i][target_str].ToString().Length > max_length)
@@ -362,18 +362,32 @@ namespace InventoryReportConversion
                         only_once = false;
                     }
                 }
+
+                if (Regex.IsMatch(data_source.Rows[i][target_str].ToString(), @"([+-]?)((?<!0)\d\.\d{1,})[eE]([+-]?)(\d+)") && only_once2 == true)  //检查是否有科学计数法的行，有则报错
+                {
+                    error_str2 = data_source.Rows[i][target_str].ToString();
+                    only_once2 = false;
+                }
             }
 
-            if (error_str == null)
+            if (error_str == null && error_str2 == null)  //无任何错误
             {
-                //MessageBox.Show(target_str + " 列最长长度为：" + max_length, "提示");
                 numberRows.Text = target_str + " 列最长长度为：" + max_length;
                 return true;
             }
-            else
+            else if (error_str != null && error_str2 == null)  //超长了
             {
                 MessageBox.Show(target_str + " 列最长长度为：" + max_length + "。警告！第一个超长的单元格内容为：" + error_str, "警告");
-                //numberRows.Text = target_str + " 列最长长度为：" + max_length + "。警告！第一个超长的单元格内容为：" + error_str;
+                return false;
+            }
+            else if (error_str == null && error_str2 != null)  //出现科学计数法了
+            {
+                MessageBox.Show(target_str + " 列出现科学计数法。第一个出错的单元格内容为：" + error_str2, "警告");
+                return true;  //没超长不需要裁剪，所以返回true
+            }
+            else  //两者都出现了
+            {
+                MessageBox.Show(target_str + " 出现列超长和科学计数法，两种错误发生！", "警告");
                 return false;
             }
         }
